@@ -89,6 +89,16 @@ export const cards = [
   },
 ];
 
+// Раньше "card-4019" была захардкожена отдельно в 5 файлах (BalancePage,
+// OperationsPage, BlocksPage, CashbackPage, NotificationsPage) как
+// начальное значение активной карты — риск разъехаться, если поменяется
+// id основной карты. Выводим из cards, а не дублируем строку: единственный
+// источник правды — флаг isMain у самой карты. Нужна отдельная константа
+// (а не вычисление в компонентах через getCards()), потому что useState
+// требует синхронного значения по умолчанию ещё до того, как отработает
+// первый fetch.
+export const defaultCardId = cards.find((c) => c.isMain)?.id;
+
 export const documents = [
   { id: "doc-statement", title: "Выписка по счёту •••• 4019", subtitle: "За последние 30 дней · PDF" },
   { id: "doc-balance-cert", title: "Справка об остатке денежных средств", subtitle: "На сегодняшнюю дату" },

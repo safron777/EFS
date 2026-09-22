@@ -8,16 +8,14 @@ import { SectionHeader } from "../components/layout/SectionHeader";
 import { useClientId } from "../components/layout/AppShell";
 import { useApi } from "../hooks/useApi";
 import { getCards, getBlocks } from "../api/client";
-import { kbStubs } from "../api/mockData";
-import { PRODUCT_TABS } from "./productTabs";
+import { kbStubs, defaultCardId } from "../api/mockData";
+import { PRODUCT_TABS, PRODUCT_ID } from "./productTabs";
 import "./pages.css";
-
-const PRODUCT_ID = "debit-mts-dengi";
 
 export function BlocksPage() {
   const clientId = useClientId();
   const { data: cards } = useApi(() => getCards(clientId, PRODUCT_ID), [clientId]);
-  const [activeCardId, setActiveCardId] = useState("card-4019");
+  const [activeCardId, setActiveCardId] = useState(defaultCardId);
   const { data: blocks, loading } = useApi(() => getBlocks(activeCardId), [activeCardId]);
 
   return (

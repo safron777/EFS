@@ -9,10 +9,8 @@ import { useClientId } from "../components/layout/AppShell";
 import { useApi } from "../hooks/useApi";
 import { getIssuance } from "../api/client";
 import { kbStubs } from "../api/mockData";
-import { PRODUCT_TABS } from "./productTabs";
+import { PRODUCT_TABS, PRODUCT_ID } from "./productTabs";
 import "./pages.css";
-
-const PRODUCT_ID = "debit-mts-dengi";
 
 const columns = [
   { key: "date", label: "Дата", width: 110 },

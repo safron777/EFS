@@ -1,4 +1,9 @@
-const base = "/products/debit-mts-dengi";
+// Единственное место, где живёт id продукта — раньше строка
+// "debit-mts-dengi" была захардкожена отдельной константой в каждой
+// из 6 страниц вкладок; импортируйте PRODUCT_ID отсюда вместо копирования.
+export const PRODUCT_ID = "debit-mts-dengi";
+
+const base = `/products/${PRODUCT_ID}`;
 
 // Подписи здесь короче, чем в PRODUCT_SUBNAV (components/layout/LeftNav.jsx) —
 // это вкладки в узкой шапке раздела, а не подменю каталога. Пути и порядок

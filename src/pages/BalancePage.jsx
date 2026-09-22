@@ -8,11 +8,9 @@ import { SectionHeader } from "../components/layout/SectionHeader";
 import { useClientId } from "../components/layout/AppShell";
 import { useApi } from "../hooks/useApi";
 import { getCards, getDocuments, sendDocument, printDocument } from "../api/client";
-import { kbStubs } from "../api/mockData";
-import { PRODUCT_TABS } from "./productTabs";
+import { kbStubs, defaultCardId } from "../api/mockData";
+import { PRODUCT_TABS, PRODUCT_ID } from "./productTabs";
 import "./pages.css";
-
-const PRODUCT_ID = "debit-mts-dengi";
 
 /**
  * Роль "Офис" — единственная, где на балансовой вкладке доступен
@@ -26,7 +24,7 @@ export function BalancePage() {
   const canPrint = true; // роль "Офис"
 
   const { data: cards, loading: cardsLoading } = useApi(() => getCards(clientId, PRODUCT_ID), [clientId]);
-  const { data: docs, loading: docsLoading } = useApi(() => getDocuments(clientId, "card-4019"), [clientId]);
+  const { data: docs, loading: docsLoading } = useApi(() => getDocuments(clientId, defaultCardId), [clientId]);
 
   if (cardsLoading || docsLoading) return <div className="state-message">Загрузка…</div>;
 

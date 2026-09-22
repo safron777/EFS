@@ -10,11 +10,9 @@ import { SectionHeader } from "../components/layout/SectionHeader";
 import { useClientId } from "../components/layout/AppShell";
 import { useApi } from "../hooks/useApi";
 import { getCards, getOperations } from "../api/client";
-import { kbStubs } from "../api/mockData";
-import { PRODUCT_TABS } from "./productTabs";
+import { kbStubs, defaultCardId } from "../api/mockData";
+import { PRODUCT_TABS, PRODUCT_ID } from "./productTabs";
 import "./pages.css";
-
-const PRODUCT_ID = "debit-mts-dengi";
 
 const columns = [
   { key: "date", label: "Дата", width: 70 },
@@ -26,7 +24,7 @@ const columns = [
 export function OperationsPage() {
   const clientId = useClientId();
   const { data: cards } = useApi(() => getCards(clientId, PRODUCT_ID), [clientId]);
-  const [activeCardId, setActiveCardId] = useState("card-4019");
+  const [activeCardId, setActiveCardId] = useState(defaultCardId);
   const { data: ops, loading } = useApi(() => getOperations(activeCardId), [activeCardId]);
 
   return (
