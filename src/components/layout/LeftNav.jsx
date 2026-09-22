@@ -2,24 +2,8 @@ import { NavLink } from "react-router-dom";
 import { AlertTriangle, CreditCard } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Pill } from "../ui/Pill";
+import { PRODUCT_SUBNAV } from "../../pages/productTabs";
 import "./LeftNav.css";
-
-/**
- * Короткий список для подменю каталога — с полными подписями
- * ("Блокировки и арест", "Оформление/перевыпуск"). Специально НЕ тот же
- * массив, что PRODUCT_TABS в ../pages/productTabs.js — там подписи короче,
- * под узкие вкладки в шапке раздела. Пути (path) и порядок должны совпадать
- * между двумя списками — при добавлении/переименовании продукта обновляйте
- * оба.
- */
-const PRODUCT_SUBNAV = [
-  { path: "balance", label: "Баланс и карты" },
-  { path: "operations", label: "Операции" },
-  { path: "blocks", label: "Блокировки и арест" },
-  { path: "cashback", label: "Кэшбэк" },
-  { path: "notifications", label: "Уведомления" },
-  { path: "issuance", label: "Оформление/перевыпуск" },
-];
 
 /**
  * Каталог слева — три независимых по смыслу раздела в одной карточке
@@ -57,11 +41,7 @@ export function LeftNav({ openMassIncidentsCount = 0 }) {
       </div>
       <div className="left-nav__subgroup">
         {PRODUCT_SUBNAV.map((t) => (
-          <NavLink
-            key={t.path}
-            to={`/products/debit-mts-dengi/${t.path}`}
-            className={({ isActive }) => `subnav-item ${isActive ? "is-active" : ""}`}
-          >
+          <NavLink key={t.to} to={t.to} className={({ isActive }) => `subnav-item ${isActive ? "is-active" : ""}`}>
             {t.label}
           </NavLink>
         ))}

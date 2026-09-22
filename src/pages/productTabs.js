@@ -5,17 +5,24 @@ export const PRODUCT_ID = "debit-mts-dengi";
 
 const base = `/products/${PRODUCT_ID}`;
 
-// Подписи здесь короче, чем в PRODUCT_SUBNAV (components/layout/LeftNav.jsx) —
-// это вкладки в узкой шапке раздела, а не подменю каталога. Пути и порядок
-// должны совпадать между двумя списками.
-export const PRODUCT_TABS = [
-  { to: `${base}/balance`, label: "Баланс и карты" },
-  { to: `${base}/operations`, label: "Операции" },
-  { to: `${base}/blocks`, label: "Блокировки/арест" },
-  { to: `${base}/cashback`, label: "Кэшбэк" },
-  { to: `${base}/notifications`, label: "Уведомления" },
-  { to: `${base}/issuance`, label: "Оформление" },
+// Единственный источник правды по вкладкам продукта. Раньше это были два
+// независимых массива (PRODUCT_TABS здесь и PRODUCT_SUBNAV в LeftNav.jsx)
+// с ручным требованием в комментарии "пути должны совпадать между двумя
+// списками" — теперь совпадать нечему, оба выводятся из одного списка.
+// shortLabel — узкие вкладки в шапке раздела (SectionHeader), fullLabel —
+// подменю каталога слева (LeftNav).
+const PRODUCT_SECTIONS = [
+  { path: "balance", shortLabel: "Баланс и карты", fullLabel: "Баланс и карты" },
+  { path: "operations", shortLabel: "Операции", fullLabel: "Операции" },
+  { path: "blocks", shortLabel: "Блокировки/арест", fullLabel: "Блокировки и арест" },
+  { path: "cashback", shortLabel: "Кэшбэк", fullLabel: "Кэшбэк" },
+  { path: "notifications", shortLabel: "Уведомления", fullLabel: "Уведомления" },
+  { path: "issuance", shortLabel: "Оформление", fullLabel: "Оформление/перевыпуск" },
 ];
+
+export const PRODUCT_TABS = PRODUCT_SECTIONS.map((s) => ({ to: `${base}/${s.path}`, label: s.shortLabel }));
+
+export const PRODUCT_SUBNAV = PRODUCT_SECTIONS.map((s) => ({ to: `${base}/${s.path}`, label: s.fullLabel }));
 
 export const INCIDENT_TABS = [
   { to: "/incidents/mass", label: "Массовые инциденты" },
