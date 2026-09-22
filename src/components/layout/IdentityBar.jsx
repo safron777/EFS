@@ -17,8 +17,22 @@ const BADGE_LABEL = {
   "mts-dengi": { label: "Клиент МТС Деньги", tone: "blue" },
 };
 
+/**
+ * Триггеры сейчас статичный мок, но придут с бэкенда (см. TODO про
+ * fetchJson в api/client.js) — без этой проверки скомпрометированный
+ * бэкенд/CMS смог бы подставить внешний URL в trigger.link, и клик по
+ * обычному <Link> увёл бы сотрудника на фишинговую страницу. Заодно
+ * отсекает известный класс обхода через обратный слэш в начале пути
+ * (браузер может трактовать "/\evil.com" как "//evil.com", см.
+ * GHSA-wrjc-x8rr-h8h6) — разрешаем только относительный внутренний путь.
+ */
+function isSafeInternalLink(link) {
+  return typeof link === "string" && /^\/(?!\/|\\)/.test(link);
+}
+
 function TriggerIcon({ trigger }) {
   const Icon = TRIGGER_ICON[trigger.icon];
+  const safeLink = isSafeInternalLink(trigger.link) ? trigger.link : null;
   const body = (
     <span className={`trigger-chip trigger-chip--${trigger.tone}`} aria-label={trigger.title}>
       <Icon size={17} />
@@ -26,7 +40,7 @@ function TriggerIcon({ trigger }) {
   );
   return (
     <span className="trigger" title={trigger.title}>
-      {trigger.link ? <Link to={trigger.link}>{body}</Link> : body}
+      {safeLink ? <Link to={safeLink}>{body}</Link> : body}
       <span className="trigger-tooltip">
         <b>{trigger.title}</b>
         <span>{trigger.text}</span>

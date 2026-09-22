@@ -4,6 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Главная карточка клиента — МТС Банк</title>
+    <!--
+      Базовый CSP как defense-in-depth на случай будущего XSS. Проверено
+      вручную (headless Chrome, dump-dom): рендерится и в npm run dev, и в
+      npm run build + preview. В dev Vite инжектит инлайновый <script>
+      (React Refresh preamble) ВЫШЕ этого тега — CSP через <meta> действует
+      только на то, что идёт после тега в документе, поэтому dev не ломается.
+      Это же общее ограничение meta-CSP (не защищает контент до самого
+      тега, не поддерживает report-uri/frame-ancestors на редиректах) — при
+      реальном деплое стоит продублировать теми же правилами через HTTP-
+      заголовок Content-Security-Policy на сервере/прокси, отдающем index.html.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
