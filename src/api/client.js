@@ -13,6 +13,14 @@ import * as mock from "./mockData";
  *   const res = await fetch(`${API_BASE_URL}${path}`, { headers: authHeaders(), ...init });
  *   if (!res.ok) throw new ApiError(res.status, await res.text());
  *   return res.json();
+ *
+ * TODO(backend): отдельно обработать 401/403 в этой точке (протухший
+ * токен/нет прав на клиента) — не как обычную сетевую ошибку. useApi
+ * сейчас кладёт любой reject в error и ничего не знает про статус-коды;
+ * useApi/AppShellOffice, скорее всего, нужно научить на 401 сбрасывать
+ * сессию и уводить на логин, а не показывать "устаревшие" данные клиента
+ * поверх старого state. Сейчас проверить нечем — fetchJson ничего не
+ * запрашивает по-настоящему.
  */
 async function fetchJson(path, { data, delay = 350 } = {}) {
   await new Promise((resolve) => setTimeout(resolve, delay));
