@@ -1,0 +1,278 @@
+.content-panel {
+  flex: 1;
+  min-height: 0;
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+
+.cards-overview {
+  flex-shrink: 0;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+}
+
+.card-tile {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.card-tile--closed {
+  opacity: 0.72;
+}
+.card-tile__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.card-tile__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-tile__name {
+  font-size: 15px;
+  font-weight: 700;
+}
+.card-tile__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+  margin-top: 2px;
+}
+.card-tile__status {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card-tile__status--active {
+  color: var(--color-success-dot);
+}
+.card-tile__status--closed {
+  color: var(--color-text-faint);
+}
+.card-tile__balance {
+  margin-top: 14px;
+  font-size: 28px;
+  font-weight: 700;
+}
+.card-tile__balance--closed {
+  color: var(--color-text-faint);
+}
+.card-tile__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+  margin-top: 2px;
+}
+.card-tile__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.docs-section .section-title {
+  margin-bottom: 8px;
+}
+.docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+}
+
+.alert-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+/* Модификаторы вместо точечных inline-стилей на каждой странице —
+   один и тот же "тревожный" вид переиспользуется на Операциях,
+   Блокировках и в разделе Массовых инцидентов. */
+.alert-box--danger {
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+}
+.alert-box--neutral {
+  border: 1px solid var(--color-border);
+}
+.alert-box--column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.alert-box--column .alert-box__actions {
+  margin-top: 14px;
+}
+.alert-box__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.alert-box__title {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.alert-box__title--danger {
+  color: var(--color-danger);
+}
+.alert-box__text {
+  font-size: 12.5px;
+  margin-top: 2px;
+}
+.alert-box__text--danger {
+  color: var(--color-danger-text-deep);
+}
+.alert-box__text--danger b {
+  color: var(--color-danger);
+}
+.alert-box__text--muted {
+  color: var(--color-text-faint);
+}
+
+/* Небольшой переиспользуемый паттерн "заголовок + подпись" внутри карточки
+   (Оформление — обе карточки, Блокировки — строка АФ, Кэшбэк — заголовки
+   секций) — раньше дублировался как inline-style в каждом месте. */
+.block-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.block-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+.block-subtext {
+  font-size: 12.5px;
+  color: var(--color-text-faint);
+}
+.block-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.block-title-row--spaced {
+  margin-bottom: 8px;
+}
+.summary-card--column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.alert-box__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.two-col {
+  display: flex;
+  gap: 14px;
+}
+.two-col > * {
+  flex: 1;
+}
+
+.summary-card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.summary-card__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+}
+.summary-card__value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.category-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: var(--font-size-base);
+}
+
+.promo-card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-row-divider);
+  gap: 12px;
+}
+.toggle-row:last-child {
+  border-bottom: none;
+}
+.toggle-row__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.toggle-row__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+  margin-top: 2px;
+}
+.toggle-row__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.top-actions-row p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-faint);
+}
+
+.state-message {
+  padding: 24px;
+  color: var(--color-text-faint);
+  font-size: var(--font-size-base);
+}

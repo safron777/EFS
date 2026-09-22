@@ -1,0 +1,73 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+
+/* На mtsdengi.ru все основные кнопки — заглавными буквами. Применяю только
+   к primary/danger-solid (это призыв к действию), а не ко всем btn-secondary
+   подряд — иначе ряды из 5-6 кнопок на карточке продукта станут менее
+   читаемыми при такой плотности. Стоит свериться с реальным UI-kit,
+   когда он будет. */
+.btn-primary,
+.btn-danger-solid {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.btn-md {
+  padding: 8px 14px;
+  font-size: var(--font-size-base);
+}
+.btn-sm {
+  padding: 6px 10px;
+  font-size: var(--font-size-sm);
+}
+
+.btn-primary {
+  background: var(--color-accent-blue);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--color-accent-blue-dark);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-danger {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger-border);
+}
+.btn-danger:hover {
+  background: var(--color-danger-bg);
+}
+
+.btn-danger-solid {
+  background: var(--color-danger);
+  color: #fff;
+}
+.btn-danger-solid:hover {
+  background: #96190f;
+}
