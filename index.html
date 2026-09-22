@@ -5,20 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Главная карточка клиента — МТС Банк</title>
     <!--
-      Базовый CSP как defense-in-depth на случай будущего XSS. Проверено
-      вручную (headless Chrome, dump-dom): рендерится и в npm run dev, и в
-      npm run build + preview. В dev Vite инжектит инлайновый <script>
-      (React Refresh preamble) ВЫШЕ этого тега — CSP через <meta> действует
-      только на то, что идёт после тега в документе, поэтому dev не ломается.
-      Это же общее ограничение meta-CSP (не защищает контент до самого
-      тега, не поддерживает report-uri/frame-ancestors на редиректах) — при
-      реальном деплое стоит продублировать теми же правилами через HTTP-
-      заголовок Content-Security-Policy на сервере/прокси, отдающем index.html.
+      CSP-meta сюда НЕ хардкодим — его инжектит vite.config.js (плагин
+      csp-meta-for-build, apply: "build") только в продакшен-сборку.
+      Причина: Vite в dev-режиме подключает CSS через рантайм-инжект
+      <style> (HMR), а не через <link> — строгий style-src 'self' это
+      блокирует, и страница рендерится вообще без стилей (проверено
+      скриншотом, не только структурой DOM — это и подвело в первый раз).
+      В dist/index.html инлайновых <script>/<style> нет вообще (весь
+      JS/CSS — внешние бандлы), поэтому в проде можно себе позволить CSP
+      без единого unsafe-inline.
     -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
-    />
   </head>
   <body>
     <div id="root"></div>
