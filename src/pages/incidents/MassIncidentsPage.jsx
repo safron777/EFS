@@ -70,8 +70,8 @@ export function MassIncidentsPage() {
             {matched && (
               <div className="alert-box alert-box--danger">
                 <div className="alert-box__text alert-box__text--danger">
-                  <b>Похоже на совпадение:</b>
-                  у клиента есть отклонённый перевод по СБП 12.09 — возможно, относится к {matched.id}.
+                  <b>Похоже на совпадение:</b>у клиента есть отклонённый перевод по СБП 12.09 — возможно, относится к{" "}
+                  {matched.id}.
                 </div>
                 <Button variant="danger" onClick={() => handleAttach(matched.id)}>
                   Привязать к {matched.id}

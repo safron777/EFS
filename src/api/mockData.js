@@ -149,9 +149,27 @@ export const cashback = {
 };
 
 export const notifications = [
-  { id: "sms-ops", title: "SMS по операциям", subtitle: "Списания и зачисления по карте •••• 4019", on: true, action: "Отключить" },
-  { id: "sms-plan", title: "SMS о плановых платежах", subtitle: "Напоминания за 3 дня до списания", on: true, action: "Отключить" },
-  { id: "push", title: "Push-уведомления в приложении", subtitle: "Операции, кэшбэк, акции", on: true, action: "Настроить" },
+  {
+    id: "sms-ops",
+    title: "SMS по операциям",
+    subtitle: "Списания и зачисления по карте •••• 4019",
+    on: true,
+    action: "Отключить",
+  },
+  {
+    id: "sms-plan",
+    title: "SMS о плановых платежах",
+    subtitle: "Напоминания за 3 дня до списания",
+    on: true,
+    action: "Отключить",
+  },
+  {
+    id: "push",
+    title: "Push-уведомления в приложении",
+    subtitle: "Операции, кэшбэк, акции",
+    on: true,
+    action: "Настроить",
+  },
 ];
 
 export const notificationMethod = {
@@ -206,13 +224,31 @@ export const massIncidents = [
 ];
 
 export const singleIncidents = [
-  { id: "ЕИ-118225", theme: "Некорректный баланс по карте", created: "02.09.2026", line: "2 линия", status: "В работе" },
+  {
+    id: "ЕИ-118225",
+    theme: "Некорректный баланс по карте",
+    created: "02.09.2026",
+    line: "2 линия",
+    status: "В работе",
+  },
   { id: "ЕИ-117904", theme: "Ошибка активации карты", created: "14.08.2026", line: "2 линия", status: "Решён" },
 ];
 
 export const complaints = [
-  { id: "Жалоба №118240", theme: "Перевод не пришёл получателю", created: "10.09.2026", term: "2 дня", status: "На 2 линии" },
-  { id: "Претензия №117580", theme: "Возврат комиссии за обслуживание", created: "20.07.2026", term: "—", status: "Удовлетворена" },
+  {
+    id: "Жалоба №118240",
+    theme: "Перевод не пришёл получателю",
+    created: "10.09.2026",
+    term: "2 дня",
+    status: "На 2 линии",
+  },
+  {
+    id: "Претензия №117580",
+    theme: "Возврат комиссии за обслуживание",
+    created: "20.07.2026",
+    term: "—",
+    status: "Удовлетворена",
+  },
 ];
 
 /** Подсказки базы знаний — сейчас статичный текст, см. InfoTooltip.jsx */

@@ -21,7 +21,9 @@
   height: 18px;
   border-radius: 50%;
   background: #fff;
-  transition: left 0.12s, right 0.12s;
+  transition:
+    left 0.12s,
+    right 0.12s;
 }
 .toggle-on .toggle-knob {
   right: 2px;

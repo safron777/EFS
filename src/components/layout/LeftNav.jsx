@@ -16,7 +16,10 @@ export function LeftNav({ openMassIncidentsCount = 0 }) {
   return (
     <Card as="nav" className="left-nav" aria-label="Каталог">
       <div className="section-title">Инциденты и обращения</div>
-      <NavLink to="/incidents/mass" className={({ isActive }) => `nav-item nav-item--critical ${isActive ? "is-active" : ""}`}>
+      <NavLink
+        to="/incidents/mass"
+        className={({ isActive }) => `nav-item nav-item--critical ${isActive ? "is-active" : ""}`}
+      >
         <span>
           <AlertTriangle size={14} className="nav-icon" />
           Массовые инциденты

@@ -7,13 +7,7 @@ import "./Button.css";
  * - danger    — деструктивное или эскалационное действие ("Заблокировать",
  *               "Оставить жалобу")
  */
-export function Button({
-  variant = "secondary",
-  size = "md",
-  icon,
-  children,
-  ...rest
-}) {
+export function Button({ variant = "secondary", size = "md", icon, children, ...rest }) {
   return (
     <button className={`btn btn-${variant} btn-${size}`} {...rest}>
       {icon}

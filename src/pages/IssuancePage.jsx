@@ -63,7 +63,9 @@ export function IssuancePage() {
             </div>
 
             <div>
-              <div className="section-title" style={{ marginBottom: 8 }}>История заявок</div>
+              <div className="section-title" style={{ marginBottom: 8 }}>
+                История заявок
+              </div>
               <DataTable columns={columns} rows={data.history} />
             </div>
           </>

@@ -24,6 +24,11 @@ export function useApi(fetcher, deps = []) {
     return () => {
       cancelled = true;
     };
+    // deps и fetcher приходят параметрами (как в useEffect), а не
+    // замыкаются напрямую — react-hooks/exhaustive-deps не умеет
+    // статически проверить такой проброс. Осознанный компромисс ради
+    // единого API useApi(fetcher, deps), см. JSDoc выше и eslint.config.js
+    // (там же отключён react-hooks/use-memo по той же причине).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
