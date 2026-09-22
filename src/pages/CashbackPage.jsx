@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Pill } from "../components/ui/Pill";
@@ -7,17 +6,21 @@ import { CardSwitcher } from "../components/shared/CardSwitcher";
 import { EscalationBar } from "../components/shared/EscalationBar";
 import { SectionHeader } from "../components/layout/SectionHeader";
 import { useClientId } from "../components/layout/AppShell";
-import { useApi } from "../hooks/useApi";
-import { getCards, getCashback } from "../api/client";
-import { kbStubs, defaultCardId } from "../api/mockData";
+import { useCardScopedData } from "../hooks/useCardScopedData";
+import { getCashback } from "../api/client";
+import { kbStubs } from "../api/mockData";
 import { PRODUCT_TABS, PRODUCT_ID } from "./productTabs";
 import "./pages.css";
 
 export function CashbackPage() {
   const clientId = useClientId();
-  const { data: cards } = useApi(() => getCards(clientId, PRODUCT_ID), [clientId]);
-  const [activeCardId, setActiveCardId] = useState(defaultCardId);
-  const { data: cashback, loading } = useApi(() => getCashback(activeCardId), [activeCardId]);
+  const {
+    cards,
+    activeCardId,
+    setActiveCardId,
+    data: cashback,
+    loading,
+  } = useCardScopedData(clientId, PRODUCT_ID, (cardId) => getCashback(cardId));
 
   return (
     <>
