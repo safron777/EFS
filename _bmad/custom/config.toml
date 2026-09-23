@@ -1,0 +1,3 @@
+[modules.bmm]
+planning_artifacts = "{project-root}/docs/planning"
+implementation_artifacts = "{project-root}/docs/implementation"

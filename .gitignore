@@ -3,3 +3,16 @@ dist/
 .DS_Store
 .env*
 EFS/
+
+# Backend (Maven multi-module, see backend/README.md)
+backend/**/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# IDE (opening the Java modules in an IDE)
+.idea/
+*.iml
+
+# BMad: rendered workflow cache -- regenerated per run, bakes in absolute
+# local paths, not meant to be shared/versioned. Keep config.toml/custom/
+# scripts/toolbox, which are the actual project scaffold.
+_bmad/render/
