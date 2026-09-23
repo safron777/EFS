@@ -86,5 +86,4 @@ sources: []
 
 ## Открытые вопросы (Open Questions)
 
-- Решение по конверту ошибок в спайне фиксирует форму (`{ error: { code, message, details? } }`), но не словарь значений `code` (например `NOT_FOUND`, `VALIDATION_ERROR`, `UPSTREAM_UNAVAILABLE`). Нужно решить до того, как истории risk-blocks/incident-case смогут точно описать поведение при ошибках.
 - AD-11 фиксирует конверт и именование топиков Kafka, но не сами поля `data` для `MassIncidentOpened`/`Updated`/`Closed`. Вероятно, зеркалит `mockData.massIncidents` (theme, product, start date, affected count, `matchesClient`, status), но это ещё не подтверждено как контракт на проводе — нужно до того, как истории CAP-10 можно будет написать точно.

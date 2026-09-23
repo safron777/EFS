@@ -133,12 +133,18 @@ No edges exist between the nine service boxes above — that absence is the rule
 - **Prevents:** the producer and consumer sides being built against incompatible topic names or payload shapes with no way to detect the mismatch until integration
 - **Rule:** topics are named `<bounded-context>.<entity>.<event-verb>` in dot-case (e.g. `incident-case.mass-incident.opened`, `.updated`, `.closed`). Every event payload is JSON with the envelope `{ "eventId": string, "eventType": string, "occurredAt": ISO-8601, "version": integer, "data": {...} }`. `incident-case-service` must ignore unknown fields inside `data` (forward-compatible) and route events carrying an unsupported `version` to a dead-letter topic rather than fail silently.
 
+### AD-12 — Schema migrations via Liquibase
+
+- **Binds:** all nine services (any service persisting data)
+- **Prevents:** each service inventing its own schema-management approach (raw `ddl-auto`, hand-run SQL, a different tool per team) once real entities exist; undocumented, unversioned schema drift
+- **Rule:** every service that owns a database manages its schema via Liquibase changelogs under `src/main/resources/db/changelog/`, applied automatically on startup (`spring.liquibase.enabled: true`, `ddl-auto` stays `none`). One changelog set per service, scoped to that service's own database only — never a cross-service changelog.
+
 ## Consistency Conventions
 
 | Concern | Convention |
 | --- | --- |
 | Naming (entities, files, interfaces, events) | Java packages `ru.mtsbank.cardoffice.<service>.{domain,application,adapters}`; REST resources plural nouns mirroring `src/api/client.js` (AD-8); Kafka topics `<bounded-context>.<entity>.<event-verb>` in dot-case (AD-11) |
-| Data & formats (ids, dates, error shapes, envelopes) | IDs are opaque strings; each service keeps the per-entity-type prefix already visible in the mock contract (`card-`, `MI-`, `ЕИ-`, `doc-`, `req-`, `complaint-`) so IDs stay visually distinguishable when they appear together (e.g. in `incident-case`'s client-attachment links) — the exact generation scheme (UUID vs. sequence) is each service's own choice. Money: signed integer minor units, never formatted (AD-3). Timestamps/dates on the wire: ISO-8601 UTC; locale/format presentation ("12.09.2026") is a frontend concern, by the same rationale as AD-3. Error envelope: `{ "error": { "code": string, "message": string, "details"?: object } }`, with HTTP status carrying the error class (4xx client, 5xx server) — uniform across all nine services |
+| Data & formats (ids, dates, error shapes, envelopes) | IDs are opaque strings; each service keeps the per-entity-type prefix already visible in the mock contract (`card-`, `MI-`, `ЕИ-`, `doc-`, `req-`, `complaint-`) so IDs stay visually distinguishable when they appear together (e.g. in `incident-case`'s client-attachment links) — the exact generation scheme (UUID vs. sequence) is each service's own choice. Money: signed integer minor units, never formatted (AD-3). Timestamps/dates on the wire: ISO-8601 UTC; locale/format presentation ("12.09.2026") is a frontend concern, by the same rationale as AD-3. Error envelope: `{ "error": { "code": string, "message": string, "details"?: object } }`, with HTTP status carrying the error class (4xx client, 5xx server) — uniform across all nine services. Shared code vocabulary (added Story 1): `NOT_FOUND`, `VALIDATION_ERROR`, `INTERNAL_ERROR`, plus the Gateway's own `UPSTREAM_UNAVAILABLE` (Story 0) — a service needing a new code adds it here, never invents a local one silently |
 | State & cross-cutting (mutation, errors, logging, config, auth) | Auth: Gateway forwards employee identity via `X-Employee-Id` trusted header (AD-7); mutations are POST, returning at minimum `{ ok: true }` today and additive-only going forward (client.js already documents real handlers will add a created-entity id); cross-context references are ID-only (AD-2); logs include the employee-id header and any cross-referenced entity ID for traceability; testing: each service's integration tests run against its own Testcontainers instances (Postgres, plus Kafka for `incident-case-service`) — never a shared or cross-service test database, consistent with AD-1's DB-per-service |
 
 ## Stack
@@ -151,6 +157,7 @@ No edges exist between the nine service boxes above — that absence is the rule
 | Apache Kafka | 4.3.1 |
 | Maven | 3.9.16 |
 | Testcontainers (Java) | 2.0.5 |
+| Liquibase | managed by the Spring Boot 4.1.1 BOM (latest standalone release verified: 5.0.3) — not overridden, to stay on Boot's tested pairing |
 
 ## Structural Seed
 
