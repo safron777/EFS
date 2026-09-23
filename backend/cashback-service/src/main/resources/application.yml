@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cashback-service
+  datasource:
+    url: jdbc:postgresql://cashback-service-postgres:5432/cashback
+    username: cashback
+    password: cashback
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

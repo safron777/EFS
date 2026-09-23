@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: offers-service
+  datasource:
+    url: jdbc:postgresql://offers-service-postgres:5432/offers
+    username: offers
+    password: offers
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

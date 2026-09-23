@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: card-issuance-service
+  datasource:
+    url: jdbc:postgresql://card-issuance-service-postgres:5432/card_issuance
+    username: card_issuance
+    password: card_issuance
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

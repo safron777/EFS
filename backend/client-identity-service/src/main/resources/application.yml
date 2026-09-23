@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: client-identity-service
+  datasource:
+    url: jdbc:postgresql://client-identity-service-postgres:5432/client_identity
+    username: client_identity
+    password: client_identity
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

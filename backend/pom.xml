@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>ru.mtsbank.cardoffice</groupId>
+  <artifactId>backend</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>mts-client-card-office backend</name>
+  <description>
+    Parent aggregator POM for the mts-client-card-office backend: API Gateway plus the nine
+    bounded-context microservices fixed by ARCHITECTURE-SPINE.md AD-1. Story 0 (infra scaffold)
+    pins the stack here in one place so every module inherits it identically; no business
+    capability (CAP-1..11) is implemented under this POM yet.
+  </description>
+
+  <modules>
+    <module>gateway</module>
+    <module>client-identity-service</module>
+    <module>offers-service</module>
+    <module>card-account-service</module>
+    <module>card-issuance-service</module>
+    <module>operations-service</module>
+    <module>risk-blocks-service</module>
+    <module>cashback-service</module>
+    <module>notifications-service</module>
+    <module>incident-case-service</module>
+  </modules>
+
+  <properties>
+    <!-- Stack pins — ARCHITECTURE-SPINE.md § Stack. Change here, not per-module. -->
+    <java.version>25</java.version>
+    <maven.compiler.release>25</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spring-boot.version>4.1.1</spring-boot.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+          <!--
+            Explicit here because this project pins Spring Boot via
+            dependencyManagement BOM import, not by inheriting from
+            spring-boot-starter-parent (that parent is what normally wires
+            this execution in implicitly). Without it, `package` produces a
+            thin jar with no Main-Class manifest entry and no embedded
+            dependencies (fails at runtime with "no main manifest attribute").
+          -->
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <release>${maven.compiler.release}</release>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+</project>

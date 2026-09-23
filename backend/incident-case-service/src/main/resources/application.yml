@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: incident-case-service
+  datasource:
+    url: jdbc:postgresql://incident-case-service-postgres:5432/incident_case
+    username: incident_case
+    password: incident_case
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

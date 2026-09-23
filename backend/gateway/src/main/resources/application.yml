@@ -1,0 +1,88 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            # Without an explicit timeout, a backing container that is down
+            # (stopped, or otherwise not responding at the TCP level -- as
+            # opposed to a running container that rejects the connection
+            # outright) leaves the Netty client waiting on the OS's own
+            # connect-timeout default, which can run to tens of seconds or
+            # more. The story's I/O matrix requires "target service down ->
+            # 502/503, not a hang", so both timeouts are bounded explicitly.
+            connect-timeout: 3000
+            response-timeout: 5s
+          routes:
+            # One route per bounded-context service (AD-1), addressed by its
+            # docker-compose service DNS name. StripPrefix=1 removes the
+            # `/<service>` segment before forwarding, so
+            # GET /client-identity/actuator/health -> GET http://client-identity-service:8080/actuator/health
+            - id: client-identity
+              uri: http://client-identity-service:8080
+              predicates:
+                - Path=/client-identity/**
+              filters:
+                - StripPrefix=1
+            - id: offers
+              uri: http://offers-service:8080
+              predicates:
+                - Path=/offers/**
+              filters:
+                - StripPrefix=1
+            - id: card-account
+              uri: http://card-account-service:8080
+              predicates:
+                - Path=/card-account/**
+              filters:
+                - StripPrefix=1
+            - id: card-issuance
+              uri: http://card-issuance-service:8080
+              predicates:
+                - Path=/card-issuance/**
+              filters:
+                - StripPrefix=1
+            - id: operations
+              uri: http://operations-service:8080
+              predicates:
+                - Path=/operations/**
+              filters:
+                - StripPrefix=1
+            - id: risk-blocks
+              uri: http://risk-blocks-service:8080
+              predicates:
+                - Path=/risk-blocks/**
+              filters:
+                - StripPrefix=1
+            - id: cashback
+              uri: http://cashback-service:8080
+              predicates:
+                - Path=/cashback/**
+              filters:
+                - StripPrefix=1
+            - id: notifications
+              uri: http://notifications-service:8080
+              predicates:
+                - Path=/notifications/**
+              filters:
+                - StripPrefix=1
+            - id: incident-case
+              uri: http://incident-case-service:8080
+              predicates:
+                - Path=/incident-case/**
+              filters:
+                - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

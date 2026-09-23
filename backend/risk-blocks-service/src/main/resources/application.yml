@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: risk-blocks-service
+  datasource:
+    url: jdbc:postgresql://risk-blocks-service-postgres:5432/risk_blocks
+    username: risk_blocks
+    password: risk_blocks
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

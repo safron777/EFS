@@ -1,0 +1,411 @@
+# mts-client-card-office backend -- local development stack.
+#
+# AD-6: gateway is the only service that publishes a host port; the 9
+# bounded-context services, their Postgres instances and Kafka are reachable
+# only on this compose file's own network.
+#
+# Bring the stack up: docker compose -f backend/docker-compose.yml up -d --wait
+# See backend/README.md for the full walkthrough (build gate, health checks,
+# host-JDK vs. build-JDK note).
+
+name: mts-client-card-office-backend
+
+services:
+  # ---- API Gateway (AD-6): single frontend entry point, only published port ----
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      client-identity-service:
+        condition: service_healthy
+      offers-service:
+        condition: service_healthy
+      card-account-service:
+        condition: service_healthy
+      card-issuance-service:
+        condition: service_healthy
+      operations-service:
+        condition: service_healthy
+      risk-blocks-service:
+        condition: service_healthy
+      cashback-service:
+        condition: service_healthy
+      notifications-service:
+        condition: service_healthy
+      incident-case-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  # ---- client-identity-service ----
+  client-identity-service:
+    build:
+      context: .
+      dockerfile: client-identity-service/Dockerfile
+    depends_on:
+      client-identity-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  client-identity-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: client_identity
+      POSTGRES_USER: client_identity
+      POSTGRES_PASSWORD: client_identity
+    volumes:
+      - client-identity-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U client_identity -d client_identity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- offers-service ----
+  offers-service:
+    build:
+      context: .
+      dockerfile: offers-service/Dockerfile
+    depends_on:
+      offers-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  offers-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: offers
+      POSTGRES_USER: offers
+      POSTGRES_PASSWORD: offers
+    volumes:
+      - offers-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U offers -d offers"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- card-account-service ----
+  card-account-service:
+    build:
+      context: .
+      dockerfile: card-account-service/Dockerfile
+    depends_on:
+      card-account-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  card-account-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: card_account
+      POSTGRES_USER: card_account
+      POSTGRES_PASSWORD: card_account
+    volumes:
+      - card-account-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U card_account -d card_account"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- card-issuance-service ----
+  card-issuance-service:
+    build:
+      context: .
+      dockerfile: card-issuance-service/Dockerfile
+    depends_on:
+      card-issuance-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  card-issuance-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: card_issuance
+      POSTGRES_USER: card_issuance
+      POSTGRES_PASSWORD: card_issuance
+    volumes:
+      - card-issuance-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U card_issuance -d card_issuance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- operations-service ----
+  operations-service:
+    build:
+      context: .
+      dockerfile: operations-service/Dockerfile
+    depends_on:
+      operations-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  operations-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: operations
+      POSTGRES_USER: operations
+      POSTGRES_PASSWORD: operations
+    volumes:
+      - operations-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U operations -d operations"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- risk-blocks-service ----
+  risk-blocks-service:
+    build:
+      context: .
+      dockerfile: risk-blocks-service/Dockerfile
+    depends_on:
+      risk-blocks-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  risk-blocks-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: risk_blocks
+      POSTGRES_USER: risk_blocks
+      POSTGRES_PASSWORD: risk_blocks
+    volumes:
+      - risk-blocks-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U risk_blocks -d risk_blocks"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- cashback-service ----
+  cashback-service:
+    build:
+      context: .
+      dockerfile: cashback-service/Dockerfile
+    depends_on:
+      cashback-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  cashback-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: cashback
+      POSTGRES_USER: cashback
+      POSTGRES_PASSWORD: cashback
+    volumes:
+      - cashback-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cashback -d cashback"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- notifications-service ----
+  notifications-service:
+    build:
+      context: .
+      dockerfile: notifications-service/Dockerfile
+    depends_on:
+      notifications-service-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  notifications-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: notifications
+      POSTGRES_USER: notifications
+      POSTGRES_PASSWORD: notifications
+    volumes:
+      - notifications-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notifications -d notifications"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- incident-case-service ----
+  incident-case-service:
+    build:
+      context: .
+      dockerfile: incident-case-service/Dockerfile
+    depends_on:
+      incident-case-service-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    networks:
+      - cardoffice-net
+
+  incident-case-service-postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: incident_case
+      POSTGRES_USER: incident_case
+      POSTGRES_PASSWORD: incident_case
+    volumes:
+      - incident-case-service-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incident_case -d incident_case"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cardoffice-net
+
+  # ---- Kafka (KRaft mode, no ZooKeeper -- Kafka 4.x removed it) ----
+  # Shared infra stood up here even though incident-case-service is the only
+  # consumer in this story's scope; every future story that touches events
+  # depends on it existing (see story Design Notes).
+  kafka:
+    image: apache/kafka:4.3.1
+    hostname: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENERS: 'CONTROLLER://:29093,PLAINTEXT://:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      # Under /home/appuser rather than /tmp: the image already creates and
+      # owns /home/appuser for the non-root user it runs as, so a fresh named
+      # volume mounted exactly there inherits that ownership (Docker copies a
+      # new volume's initial permissions from the image's existing directory
+      # at the mount path). Mounting under /tmp instead gets a volume owned by
+      # root with no such directory to copy from, which the broker then can't
+      # write to.
+      KAFKA_LOG_DIRS: '/home/appuser/kraft-combined-logs'
+    volumes:
+      - kafka-data:/home/appuser
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - cardoffice-net
+
+networks:
+  cardoffice-net:
+    driver: bridge
+
+volumes:
+  client-identity-service-pgdata:
+  offers-service-pgdata:
+  card-account-service-pgdata:
+  card-issuance-service-pgdata:
+  operations-service-pgdata:
+  risk-blocks-service-pgdata:
+  cashback-service-pgdata:
+  notifications-service-pgdata:
+  incident-case-service-pgdata:
+  kafka-data:

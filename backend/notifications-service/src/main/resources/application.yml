@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: notifications-service
+  datasource:
+    url: jdbc:postgresql://notifications-service-postgres:5432/notifications
+    username: notifications
+    password: notifications
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
