@@ -1,0 +1,140 @@
+- id: "0"
+  title: Инфраструктурный каркас — монорепо, Gateway, docker-compose, Kafka
+  description: >-
+    Maven multi-module скелет на все 9 сервисов + gateway-модуль; docker-compose,
+    поднимающий Gateway, 9 инстансов PostgreSQL и Kafka. Без бизнес-логики —
+    только то, что нужно, чтобы остальные истории было куда класть.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Смотри ARCHITECTURE-SPINE.md: AD-1 (9 сервисов, у каждого своя БД, никаких
+    общих схем), AD-6 (Gateway — единственная точка входа для фронтенда, сервисы
+    не публикуют порты наружу в docker-compose), и таблицу Stack (Java 25 LTS,
+    Spring Boot 4.1.1, PostgreSQL 18.6, Kafka 4.3.1, Maven 3.9.16, Testcontainers
+    2.0.5). Структура репозитория — как в разделе Structural Seed спайна.
+
+- id: "1"
+  title: CAP-1 — Client identity
+  description: >-
+    Эндпоинт профиля клиента: badges, triggers, открытые обращения. Смотри
+    SPEC.md CAP-1.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    REST-форма — AD-8 (мирроринг client.js: /clients/{id}). Поле link у каждого
+    trigger обязано пройти правило AD-4 (только относительный внутренний путь,
+    иначе null) — это унаследованная защита от open-redirect (GHSA-wrjc-x8rr-h8h6).
+
+- id: "2"
+  title: CAP-2 — Top offer
+  description: >-
+    Эндпоинт топ-предложения клиента через отдельный сервис offers. Смотри
+    SPEC.md CAP-2.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Это девятый сервис, добавленный отдельно от client-identity (AD-1). Внешний
+    offer-движок банка — за stub-портом OfferEnginePort (AD-10, тот же паттерн,
+    что и risk-blocks). Ссылка на клиента — только по clientId (AD-2), не копия
+    данных.
+
+- id: "3"
+  title: CAP-3 — Card-account: карты и баланс
+  description: >-
+    Список карт клиента по продукту, баланс, статус, переключение активной
+    карты. Смотри SPEC.md CAP-3.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Деньги — целое число в копейках, никогда отформатированная строка (AD-3).
+    Форматирование — забота фронтенда.
+
+- id: "4"
+  title: CAP-4 — Card-account: документы
+  description: >-
+    Справки/выписки по счёту (statement, balance cert, flow cert) для карты.
+    Смотри SPEC.md CAP-4.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: ""
+
+- id: "5"
+  title: CAP-5 — Card issuance
+  description: >-
+    Текущая заявка на выпуск/перевыпуск карты и история заявок. Смотри SPEC.md
+    CAP-5.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: ""
+
+- id: "6"
+  title: CAP-6 — Operations
+  description: >-
+    История операций по карте, включая алерт о неуспешном переводе по СБП.
+    Смотри SPEC.md CAP-6.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Деньги — целое число в копейках, никогда отформатированная строка (AD-3).
+
+- id: "7"
+  title: CAP-7 — Risk blocks
+  description: >-
+    Статус блокировок карты по трём источникам: СФМ, арест ФССП, антифрод.
+    Смотри SPEC.md CAP-7.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Этот сервис фасадит три stub-порта (SfmPort/FsspPort/AntifraudPort, AD-10) —
+    у него больше всего путей отказа среди всех 9 сервисов. Перед реализацией
+    нужно закрыть открытый вопрос 1 из SPEC.md: словарь значений error.code
+    (например NOT_FOUND, VALIDATION_ERROR, UPSTREAM_UNAVAILABLE — последнее
+    особенно важно здесь, если один из трёх stub-портов "недоступен"). Реши это
+    на этапе спеки данной истории, до кода.
+
+- id: "8"
+  title: CAP-8 — Cashback
+  description: >-
+    Накопленный кэшбэк, ставки по категориям, активная промо-акция. Смотри
+    SPEC.md CAP-8.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: ""
+
+- id: "9"
+  title: CAP-9 — Notifications
+  description: >-
+    Тумблеры каналов уведомлений по карте + основной способ связи с клиентом
+    (ОМТ). Смотри SPEC.md CAP-9.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: ""
+
+- id: "10"
+  title: CAP-10 — Incident-case: массовые инциденты
+  description: >-
+    Приём массовых инцидентов из системы мониторинга через Kafka-события,
+    привязка клиента к инциденту. Смотри SPEC.md CAP-10.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Самая рискованная интеграция во всей спеке — событие Kafka должно реально
+    дойти до экрана инцидентов без REST-опроса (AD-5). Перед реализацией нужно
+    закрыть открытый вопрос 2 из SPEC.md: точные поля внутри data для
+    MassIncidentOpened/Updated/Closed (вероятно зеркалят mockData.massIncidents
+    — theme, product, start, status, affected, matchesClient — но это не
+    подтверждено как контракт на проводе). Топик/конверт — уже зафиксированы
+    в AD-11, обсуждению не подлежат, только поля data. done_checkpoint стоит
+    осознанно: хочу убедиться, что событие реально доходит до фронтенда, прежде
+    чем двигаться дальше.
+
+- id: "11"
+  title: CAP-11 — Incident-case: единичные инциденты и жалобы
+  description: >-
+    Создание и просмотр единичных инцидентов и жалоб клиента. Смотри SPEC.md
+    CAP-11.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    REST-форма — AD-8 (мирроринг client.js: createSingleIncident,
+    createComplaint).
