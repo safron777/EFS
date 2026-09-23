@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проектное решение — бэкенд card-office (МТС Банк)</title>
+<style>
+  :root {
+    --ink: #1a1f2b;
+    --muted: #4a5568;
+    --muted-2: #6a7179;
+    --bg: #fbfbf8;
+    --card-bg: #ffffff;
+    --border: #e3e6e4;
+    --accent: #b3001b;
+    --accent-bg: #fbeaec;
+    --accent-border: #e9b9bf;
+    --dark-bg: #1a1f2b;
+    --dark-text: #f2f2f0;
+    --dark-muted: #c7ccd6;
+    --code-bg: #eef0ee;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'IBM Plex Sans', Arial, sans-serif;
+    --serif: Georgia, 'Source Serif 4', 'Times New Roman', serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eef0f2; --muted: #b7c0cc; --muted-2: #9aa4b2;
+      --bg: #14171f; --card-bg: #1b2029; --border: #2b3140;
+      --accent: #ff8a93; --accent-bg: #2c1a1d; --accent-border: #5a2c31;
+      --dark-bg: #0c0f15; --dark-text: #f2f2f0; --dark-muted: #b9c2cf;
+      --code-bg: #232938;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eef0f2; --muted: #b7c0cc; --muted-2: #9aa4b2;
+    --bg: #14171f; --card-bg: #1b2029; --border: #2b3140;
+    --accent: #ff8a93; --accent-bg: #2c1a1d; --accent-border: #5a2c31;
+    --dark-bg: #0c0f15; --dark-text: #f2f2f0; --dark-muted: #b9c2cf;
+    --code-bg: #232938;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); line-height: 1.6; font-size: 17px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px 120px; }
+  header.hero {
+    background: var(--dark-bg); color: var(--dark-text);
+    padding: 72px 24px 56px;
+  }
+  header.hero .inner { max-width: 920px; margin: 0 auto; }
+  header.hero .eyebrow {
+    color: #ff8a93; text-transform: uppercase; letter-spacing: 2px;
+    font-size: 14px; font-weight: 700; margin: 0 0 14px;
+  }
+  header.hero h1 {
+    font-family: var(--serif); font-size: 42px; line-height: 1.2; margin: 0 0 18px; font-weight: 600;
+  }
+  header.hero p.sub { font-size: 19px; color: var(--dark-muted); max-width: 700px; margin: 0 0 24px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .meta-pill {
+    font-size: 13px; color: var(--dark-muted); border: 1px solid #333c4d;
+    border-radius: 999px; padding: 5px 14px;
+  }
+  nav.toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 28px; margin: -32px 0 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin: 0 0 12px; }
+  nav.toc ol { columns: 2; margin: 0; padding-left: 20px; font-size: 15px; }
+  nav.toc li { margin-bottom: 6px; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+  section.block { margin: 56px 0; }
+  h2.section-title {
+    font-family: var(--serif); font-size: 30px; font-weight: 600; margin: 0 0 8px;
+    padding-top: 8px; border-top: 3px solid var(--accent); padding-top: 16px;
+  }
+  h2.section-title .num { color: var(--accent); font-family: var(--mono); font-size: 18px; margin-right: 10px; }
+  h3 { font-family: var(--serif); font-size: 22px; font-weight: 600; margin: 32px 0 12px; }
+  p { margin: 0 0 16px; }
+  code, .id { font-family: var(--mono); font-size: 0.88em; background: var(--code-bg); border-radius: 4px; padding: 1px 6px; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 8px; }
+  .lede { font-size: 19px; color: var(--muted); }
+  .ad-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px 28px; margin: 20px 0;
+  }
+  .ad-card .ad-tag {
+    display: inline-block; font-family: var(--mono); font-size: 13px; font-weight: 700;
+    color: #fff; background: var(--accent); border-radius: 6px; padding: 2px 10px; margin-bottom: 10px;
+  }
+  .callout {
+    border-left: 4px solid var(--accent); background: var(--accent-bg);
+    border-radius: 0 12px 12px 0; padding: 18px 24px; margin: 20px 0;
+  }
+  .callout strong { color: var(--accent); }
+  .honest {
+    border: 2px dashed var(--accent-border); background: var(--accent-bg);
+    border-radius: 14px; padding: 22px 26px; margin: 24px 0;
+  }
+  .honest .tag { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .service-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 20px 0; }
+  @media (max-width: 720px) { .service-grid { grid-template-columns: 1fr; } nav.toc ol { columns: 1; } }
+  .service-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+  }
+  .service-card .name { font-family: var(--mono); font-weight: 700; font-size: 15px; margin-bottom: 6px; display: block; }
+  .service-card .desc { font-size: 14px; color: var(--muted); margin: 0; }
+  .deferred-item {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .deferred-item h4 { margin: 0 0 8px; font-size: 17px; }
+  .deferred-item p { margin: 0; color: var(--muted); font-size: 15px; }
+  .deferred-item .revisit { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 8px; }
+  footer.doc-footer {
+    margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border);
+    color: var(--muted-2); font-size: 14px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .pkg-tree { background: var(--code-bg); border-radius: 10px; padding: 18px 22px; font-family: var(--mono); font-size: 13.5px; overflow-x: auto; white-space: pre; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <p class="eyebrow">Проектное решение · card-office · МТС Банк</p>
+    <h1>Бэкенд клиент-карточного офиса: полное описание архитектуры</h1>
+    <p class="sub">Прозаический компаньон к ARCHITECTURE-SPINE.md — контекст, мотивация и обоснование каждого решения, для тех, кто не участвовал в коучинг-сессии.</p>
+    <div class="meta-row">
+      <span class="meta-pill">Статус спины: final</span>
+      <span class="meta-pill">Обновлено: 2026-09-23</span>
+      <span class="meta-pill">9 bounded contexts · 11 архитектурных решений (AD-1…AD-11)</span>
+      <span class="meta-pill">Автор: Алексей Сафронов</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#context">Контекст и постановка задачи</a></li>
+    <li><a href="#scope">Масштаб: демо-прототип, не боевой контур</a></li>
+    <li><a href="#paradigm">Парадигма: DDD + hexagonal</a></li>
+    <li><a href="#boundaries">Девять bounded context и DB-per-service</a></li>
+    <li><a href="#communication">Правила коммуникации между сервисами</a></li>
+    <li><a href="#internals">Внутреннее устройство сервиса</a></li>
+    <li><a href="#conventions">Сквозные соглашения о данных</a></li>
+    <li><a href="#external">Внешние системы и паттерн stub-порта</a></li>
+    <li><a href="#stack">Технологический стек и обоснование версий</a></li>
+    <li><a href="#data-model">Модель данных и владение по сервисам</a></li>
+    <li><a href="#tree">Структура репозитория</a></li>
+    <li><a href="#deferred">Что отложено и почему</a></li>
+    <li><a href="#closing">Статус и дальнейшие шаги</a></li>
+  </ol>
+</nav>
+
+<section class="block" id="context">
+  <h2 class="section-title">Контекст и постановка задачи</h2>
+  <p class="lede">Фронтенд клиент-карточного офиса МТС Банк — рабочий React-прототип: сотрудник открывает карточку клиента и видит профиль, карты, операции, блокировки, кешбэк, уведомления и инциденты. Сегодня все эти данные приходят из моков в <code>src/api/client.js</code> и <code>src/api/mockData.js</code> — реального бэкенда не существует.</p>
+  <p>Эта архитектура фиксирует инварианты бэкенда, который заменит моки на реальные сервисы. Ключевое ограничение, определившее весь дальнейший выбор: контракт вызовов, который фронтенд уже использует, должен остаться прежним — иначе замена мока на реальный сервис вынудит переписывать интерфейс, а не только его источник данных. Отсюда прямая линия к решению «REST-контракт зеркалит существующую форму client.js» (AD-8) и к тому, что Gateway — единственная точка входа с тем же единым base URL, который сегодня подразумевает <code>fetchJson</code>.</p>
+</section>
+
+<section class="block" id="scope">
+  <h2 class="section-title">Масштаб: демо-прототип, не боевой контур</h2>
+  <p>Это первое и самое широкое решение, определяющее все остальные: бэкенд строится как <strong>демо/прототип уровня</strong>, а не как продакшн-система банка. Java-микросервисы с PostgreSQL реальны и построены по DDD, но внешние системы (СФМ, ФССП, антифрод, офер-движок, система мониторинга) представлены заглушками (stub adapters), возвращающими фикстуры, а не реальными протокольными интеграциями. Тестирование опирается на Testcontainers, разворачивание — на локальный docker-compose.</p>
+  <p>Формулировка масштаба сделана намеренно явной, потому что не проговорённый масштаб — источник главного риска при показе архитектуры руководству: без явного маркера «demo» решения об отложенной продакшн-авторизации или отсутствии реального протокола интеграции с ФССП легко прочитать как упущение, а не как согласованную границу текущего трека.</p>
+  <p>Из этого масштаба прямо следуют пункты раздела <a href="#deferred">«Что отложено»</a>: производственная инфраструктура, реальные протоколы внешних систем и модель ролей сотрудника не решаются сейчас не потому, что о них забыли, а потому, что демо-масштаб explicit их не требует.</p>
+</section>
+
+<section class="block" id="paradigm">
+  <h2 class="section-title">Парадигма: Domain-Driven Design + hexagonal</h2>
+  <p>Архитектура строится на связке двух паттернов, применённых на разных уровнях: <strong>DDD (Domain-Driven Design)</strong> определяет границы между сервисами — каждый bounded context становится отдельным разворачиваемым Spring Boot сервисом; <strong>hexagonal (ports-and-adapters)</strong> определяет внутреннее устройство каждого такого сервиса.</p>
+  <p>Явного «shared kernel» и общей базы данных между сервисами нет — это не техническая деталь, а прямое следствие выбора DDD: если бы два сервиса разделяли схему или библиотеку доменных объектов, независимая поставка одного сервиса без оглядки на другой стала бы невозможной, а именно эта независимость — цель разбиения на bounded contexts.</p>
+  <p>Hexagonal-слой внутри сервиса решает другую задачу: он не даёт деталям реализации (HTTP-фреймворк, конкретная СУБД, протокол внешней системы) просочиться в бизнес-правила. Практически это выражено в фиксированном пакете <code>domain/</code> (сущности, value objects, доменные сервисы и <em>порты</em> — интерфейсы, которые нужны домену) и <code>application/</code> (сценарии использования, оркеструющие домен через порты). Всё, что «снаружи» — REST-контроллеры, JPA-репозитории, адаптеры внешних систем — реализует эти порты, но не наоборот: домен ничего не знает про то, как именно к нему пришёл запрос или куда уйдёт результат.</p>
+  <div class="callout"><strong>Почему это важно для нетехнической аудитории:</strong> представьте девять независимых филиалов банка, каждый — с собственным архивом (своя PostgreSQL). Филиалы не роются в чужих папках, а обмениваются короткими записками с номером дела (ID). Внутри каждого филиала работа всегда идёт по одной и той же схеме: заявка приходит через приёмную (adapters/in), клерк применяет правила банка (domain), после чего результат уходит в архив или во внешнюю инстанцию (adapters/out). Эта внутренняя схема одинакова для всех девяти филиалов, но какой конкретно филиал за что отвечает — фиксировано отдельно (см. следующий раздел).</div>
+</section>
+
+<section class="block" id="boundaries">
+  <h2 class="section-title"><span class="num">AD-1</span>Девять bounded context и DB-per-service</h2>
+  <p>Ровно девять сервисов, выведенных из существующего фронтенд-контракта, каждый — отдельная PostgreSQL-схема без общих таблиц и без cross-service join'ов:</p>
+  <div class="service-grid">
+    <div class="service-card"><span class="name">client-identity</span><p class="desc">Профиль клиента, бейджи, триггеры, ссылки на открытые кейсы</p></div>
+    <div class="service-card"><span class="name">offers</span><p class="desc">Топ-предложение банка клиенту — фасад над stub-портом к внешнему офер-движку</p></div>
+    <div class="service-card"><span class="name">card-account</span><p class="desc">Карты, балансы, привязанный счёт, документы по счёту</p></div>
+    <div class="service-card"><span class="name">card-issuance</span><p class="desc">Заявки на выпуск/перевыпуск карты и история выпуска</p></div>
+    <div class="service-card"><span class="name">operations</span><p class="desc">История операций по карте, алерты о неудачных переводах</p></div>
+    <div class="service-card"><span class="name">risk-blocks</span><p class="desc">Статус блокировок СФМ / арест ФССП / антифрод — фасад над тремя stub-портами</p></div>
+    <div class="service-card"><span class="name">cashback</span><p class="desc">Накопленный кешбэк, категории и ставки, промо-предложения</p></div>
+    <div class="service-card"><span class="name">notifications</span><p class="desc">Каналы уведомлений по карте, основной способ связи (ОМТ)</p></div>
+    <div class="service-card"><span class="name">incident-case</span><p class="desc">Массовые инциденты (из Kafka), единичные инциденты, жалобы, привязка клиента к массовому инциденту</p></div>
+  </div>
+  <p><strong>Мотивация.</strong> Без явно зафиксированной границы новая возможность обычно попадает в ближайший существующий сервис «по пути наименьшего сопротивления» — это и есть тот сценарий, который правило исключает: любая способность, не подходящая ни под один из девяти владельцев, требует нового AD (десятого сервиса), а не тихого расширения scope соседнего. Именно так появился <code>offers</code>: вызов <code>getOffer</code> в исходном фронтенд-контракте не вписывался в <code>client-identity</code> по смыслу владения данными, и вместо расширения client-identity под чужую ответственность был выделен отдельный сервис с собственным stub-портом к внешнему офер-движку — тем же паттерном, что уже применялся для risk-blocks.</p>
+  <p>DB-per-service — прямое следствие того же принципа на уровне данных: общая схема между двумя сервисами означает, что независимая поставка одного невозможна без координации с другим, что отменяет саму цель разбиения. <span class="id">AD-2</span> — вытекающее правило: сервис, которому нужна сущность другого контекста, хранит только её ID (<code>clientId</code>, <code>cardId</code>, <code>incidentId</code>…), никогда не денормализованную копию полей. Это предотвращает ситуацию, когда, например, имя клиента закешировано в двух сервисах и один из них не узнал об обновлении.</p>
+</section>
+
+<section class="block" id="communication">
+  <h2 class="section-title"><span class="num">AD-6, AD-9, AD-5</span>Правила коммуникации между сервисами</h2>
+  <div class="ad-card">
+    <span class="ad-tag">AD-6</span>
+    <h3 style="margin-top:0">API Gateway — единственная точка входа</h3>
+    <p>Spring Cloud Gateway — единственный ingress, с которым говорит фронтенд; сервисы не достижимы из сети фронтенда напрямую (в demo docker-compose порт на хост публикует только Gateway). Мотивация прямая: сегодняшний <code>fetchJson</code> во фронтенде предполагает единый base URL — devять отдельных базовых адресов фрагментировали бы этот контракт и потребовали бы отдельно управлять авторизацией на каждом.</p>
+  </div>
+  <div class="ad-card">
+    <span class="ad-tag">AD-9</span>
+    <h3 style="margin-top:0">Сервисы никогда не вызывают друг друга синхронно</h3>
+    <p>Ни один из девяти сервисов не делает HTTP-вызов к другому. Сборка данных из разных контекстов — это либо несколько независимых Gateway-вызовов (фронтенд уже сегодня вызывает <code>getClientCard</code>, <code>getCards</code>, <code>getOperations</code> отдельно, поэтому серверная агрегация не нужна), либо реакция на событие Kafka для состояния, которое должно реагировать на изменения в другом контексте.</p>
+    <p>Это предотвращает скрытую цепочку вызовов «сервис вызывает сервис», которая незаметно превращает девять независимо поставляемых сервисов в один распределённый монолит — риск тем более реальный, что в микросервисной архитектуре он не виден на уровне кода одного сервиса, а проявляется только в графе вызовов всей системы.</p>
+  </div>
+  <div class="ad-card">
+    <span class="ad-tag">AD-5 / AD-11</span>
+    <h3 style="margin-top:0">Массовые инциденты приходят как события Kafka, никогда через поллинг</h3>
+    <p>Система мониторинга публикует <code>MassIncidentOpened</code> / <code>MassIncidentUpdated</code> / <code>MassIncidentClosed</code> в Kafka; <code>incident-case-service</code> — единственный потребитель и система записи для состояния массовых инцидентов. Ни один другой сервис не читает это состояние напрямую из системы мониторинга.</p>
+    <p>Топики именуются <code>&lt;bounded-context&gt;.&lt;entity&gt;.&lt;event-verb&gt;</code> в dot-case (например, <code>incident-case.mass-incident.opened</code>). Конверт события: <code>{ eventId, eventType, occurredAt, version, data }</code> в JSON; <code>incident-case-service</code> обязан игнорировать неизвестные поля внутри <code>data</code> (прямая совместимость) и направлять события с неподдерживаемой <code>version</code> в dead-letter топик, а не падать молча.</p>
+    <p>Мотивация поллинга-запрета: разница между «когда инцидент реально открылся» и «когда мы это заметили» — именно то расхождение, которое поллинг создаёт, а push-модель через Kafka устраняет по конструкции.</p>
+  </div>
+</section>
+
+<section class="block" id="internals">
+  <h2 class="section-title">Внутреннее устройство сервиса</h2>
+  <p>Единый пакетный layout для всех девяти сервисов, базовый пакет <code>ru.mtsbank.cardoffice.&lt;service&gt;</code>:</p>
+  <div class="pkg-tree">domain/                      # сущности, value objects, доменные сервисы, порты
+application/                 # сценарии использования — оркестрируют домен через порты
+adapters/in/web/             # REST-контроллеры (AD-8), только перевод HTTP ⇄ application, без бизнес-логики
+adapters/in/messaging/       # Kafka-консьюмеры (только incident-case-service, см. AD-5)
+adapters/out/persistence/    # JPA-репозитории поверх собственной PostgreSQL
+adapters/out/external/       # stub-адаптеры для внешних систем (AD-10) — единственное место,
+                              # которое затронет будущая реальная интеграция</div>
+  <p>Правило простое и проверяемое по коду: <code>adapters/in/web</code> и <code>adapters/in/messaging</code> — единственные, кто говорит с внешним миром «внутрь»; <code>adapters/out/persistence</code> и <code>adapters/out/external</code> — единственные, кто говорит «наружу». Всё, что между ними — <code>application</code> и <code>domain</code> — не зависит от того, HTTP это, Kafka, JPA или stub-фикстура.</p>
+</section>
+
+<section class="block" id="conventions">
+  <h2 class="section-title"><span class="num">AD-3, AD-4, AD-8</span>Сквозные соглашения о данных</h2>
+  <div class="ad-card">
+    <span class="ad-tag">AD-3</span>
+    <h3 style="margin-top:0">Деньги — целое число в минорных единицах, никогда не строка</h3>
+    <p>Каждая денежная величина — целое число копеек (со знаком), никогда не строка с символом валюты, разделителем тысяч или знаком. Правило распространяется на <code>card-account</code>, <code>operations</code>, <code>cashback</code>, сумму ареста в <code>risk-blocks</code> и любой сервис, возвращающий денежную сумму.</p>
+    <p>Мотивация: как только форматирование валюты попадает в бэкенд, оно неизбежно начинает расходиться с форматированием фронтенда (разные локали, разная логика округления) — источник трудноуловимых багов при парсинге строки обратно в число. Представление остаётся числом; форматирование под локаль («12 450,00 ₽») — исключительно забота фронтенда.</p>
+  </div>
+  <div class="ad-card">
+    <span class="ad-tag">AD-4 <em style="color:var(--muted); font-weight:400;">[ADOPTED]</em></span>
+    <h3 style="margin-top:0">Поля-ссылки — только относительные внутренние пути</h3>
+    <p>Любое поле ответа, несущее ссылку/URL (сегодня — поле <code>link</code> у триггера в <code>client-identity</code>, в будущем — любое такое поле в любом сервисе), обязано быть путём вида <code>^/(?!/|\\)</code> — относительным, внутренним, никогда не начинающимся с <code>//</code>, <code>\</code> или схемы (<code>http:</code>, <code>javascript:</code>…). Сервис, который не может выразить цель таким образом, обязан вернуть <code>null</code>, никогда абсолютный URL.</p>
+    <p>Правило унаследовано напрямую от уже существующей защиты на фронтенде — <code>IdentityBar.isSafeInternalLink</code>, закрывающей уязвимость GHSA-wrjc-x8rr-h8h6. Смысл дублирования на бэкенде в том, что клиентская проверка не должна быть единственным рубежом: скомпрометированный или просто небрежно написанный сервис не должен иметь возможности передать `<Link>` абсолютный или protocol-relative адрес, полагаясь на то, что фронтенд его отфильтрует.</p>
+  </div>
+  <div class="ad-card">
+    <span class="ad-tag">AD-8 <em style="color:var(--muted); font-weight:400;">[ADOPTED]</em></span>
+    <h3 style="margin-top:0">REST-контракт зеркалит существующую форму фронтенда</h3>
+    <p>Пути ресурсов повторяют форму, уже заданную в <code>src/api/client.js</code>: <code>/clients/{id}</code>, <code>/clients/{id}/offers/top</code>, <code>/clients/{id}/products/{productId}/cards</code>, <code>/cards/{cardId}/operations</code>, <code>/cards/{cardId}/blocks</code>, <code>/cards/{cardId}/cashback</code>, <code>/clients/{id}/incidents/single</code>, <code>/incidents/mass</code> и так далее. GET — для чтения; POST — для действий и мутаций (attach, create, toggle, send, print); тело запроса/ответа — JSON.</p>
+    <p>Это не стилистический выбор, а прямое следствие раздела «Контекст»: контракт уже существует и уже согласован с UI, поэтому девяти сервисам незачем изобретать девять разных конвенций именования эндпоинтов, которые заставили бы Gateway транслировать вызовы вместо простой маршрутизации.</p>
+  </div>
+  <h3>Прочие сквозные конвенции</h3>
+  <table>
+    <tr><th>Область</th><th>Конвенция</th></tr>
+    <tr><td>Идентификаторы</td><td>Непрозрачные строки; каждый сервис сохраняет уже видимый в моках префикс по типу сущности (<code>card-</code>, <code>MI-</code>, <code>ЕИ-</code>, <code>doc-</code>, <code>req-</code>, <code>complaint-</code>), чтобы ID оставались визуально различимы, когда встречаются вместе (например, в привязках клиента к массовому инциденту в incident-case). Конкретная схема генерации (UUID или последовательность) — выбор каждого сервиса.</td></tr>
+    <tr><td>Даты и время</td><td>На проводе — ISO-8601 UTC; локальное форматирование («12.09.2026») — забота фронтенда, по той же логике, что и деньги (AD-3).</td></tr>
+    <tr><td>Конверт ошибки</td><td><code>{ error: { code, message, details? } }</code>, HTTP-статус несёт класс ошибки (4xx клиент, 5xx сервер) — единообразно для всех девяти сервисов.</td></tr>
+    <tr><td>Мутации</td><td>Всегда POST, минимум возвращают <code>{ ok: true }</code>, аддитивно расширяемы (client.js уже документирует, что реальные обработчики добавят id созданной сущности).</td></tr>
+    <tr><td>Логирование</td><td>Логи включают заголовок employee-id и любой cross-referenced ID сущности — для трассируемости через границы сервисов, которые сами по себе не видят друг друга (AD-9).</td></tr>
+    <tr><td>Тестирование</td><td>Интеграционные тесты каждого сервиса — против собственных Testcontainers-инстансов (Postgres, плюс Kafka для incident-case-service); никогда не общая или межсервисная тестовая база — согласовано с DB-per-service (AD-1).</td></tr>
+  </table>
+</section>
+
+<section class="block" id="external">
+  <h2 class="section-title"><span class="num">AD-10, AD-7</span>Внешние системы и честная граница демо</h2>
+  <div class="ad-card">
+    <span class="ad-tag">AD-10</span>
+    <h3 style="margin-top:0">Внешние системы — за stub-портом, не внутри доменной логики</h3>
+    <p>Каждый сервис, которому нужна внешняя система, определяет один порт-интерфейс на систему в своём domain/application слое: <code>risk-blocks-service</code> — <code>SfmPort</code>, <code>FsspPort</code>, <code>AntifraudPort</code>; <code>offers-service</code> — <code>OfferEnginePort</code>. В демо каждый порт связан со stub-адаптером в <code>adapters/out/external/</code>, возвращающим фикстуры.</p>
+    <p>Мотивация — предотвратить ровно тот сценарий, где логика фикстур незаметно вплетается в доменный/application-код: если бы это произошло, замена на реальный протокол интеграции стала бы переписыванием бизнес-логики, а не подключением нового адаптера. Благодаря порту замена добавляет только новую реализацию адаптера — домен и application-слой не меняются вообще. <code>risk-blocks-service</code> здесь самый показательный случай: один сервис фасадом закрывает сразу три независимые внешние системы через три раздельных порта.</p>
+  </div>
+  <div class="honest">
+    <p class="tag">AD-7 · честно про ограничение демо</p>
+    <h3 style="margin-top:8px">Авторизация — заглушка, выданная Gateway, а не модель безопасности</h3>
+    <p>Gateway аутентифицирует (пока — заглушкой) и передаёт identity сотрудника как доверенный заголовок (например, <code>X-Employee-Id</code>); каждый сервис доверяет этому заголовку без повторной аутентификации. Поскольку AD-6 делает сервисы недостижимыми, кроме как через Gateway, проверка подписи заголовка на стороне сервиса для демо не требуется.</p>
+    <p><strong>Это явно временное решение.</strong> Оно существует, чтобы девять сервисов не изобретали девять разных способов понять «кто этот сотрудник» для демо-контура, и чтобы фронтенд мог отработать уже заложенную в нём обработку 401/403. Настоящая замена — OAuth2/OIDC через корпоративный SSO — зафиксирована как отложенный пункт (см. ниже), а не как нерешённый вопрос: срок пересмотра — момент, когда этот трек перестанет быть демо.</p>
+  </div>
+</section>
+
+<section class="block" id="stack">
+  <h2 class="section-title">Технологический стек и обоснование версий</h2>
+  <p>Каждая версия была проверена на актуальность на момент фиксации архитектуры (сентябрь 2026), а не выбрана по умолчанию — источники приведены в рабочем журнале запуска (<code>.memlog.md</code>).</p>
+  <table>
+    <tr><th>Компонент</th><th>Версия</th><th>Почему эта версия</th></tr>
+    <tr><td>Java</td><td>25 LTS</td><td>Актуальная текущая LTS-версия на сентябрь 2026 (вышла 2025-09-16); Java 26 существует, но не является LTS — источник: Oracle Java SE support roadmap / история версий Java.</td></tr>
+    <tr><td>Spring Boot</td><td>4.1.1</td><td>Актуальный стабильный релиз (вышел 2026-08-20), требует Java 17+, совместим вплоть до Java 26 — источник: endoflife.date/spring-boot, codejava.net.</td></tr>
+    <tr><td>PostgreSQL</td><td>18.6</td><td>Актуальная стабильная мажорная линия (вышла 2026-08-13); PostgreSQL 19 на момент фиксации — в бете — источник: релиз-ноты postgresql.org.</td></tr>
+    <tr><td>Apache Kafka</td><td>4.3.1</td><td>Патч-версия ветки 4.3, актуальная стабильная на сентябрь 2026 — источник: анонсы релизов kafka.apache.org.</td></tr>
+    <tr><td>Maven</td><td>3.9.16</td><td>Актуальная стабильная версия (вышла 2026-05-17) — источник: страница загрузок maven.apache.org / endoflife.date.</td></tr>
+    <tr><td>Testcontainers (Java)</td><td>2.0.5</td><td>Актуальная версия (вышла 2026-04-20) — источник: релизы testcontainers-java на GitHub, mvnrepository.com.</td></tr>
+  </table>
+  <p>Сборка — Maven, один <code>pom.xml</code> на сервис плюс родительский агрегирующий POM монорепозитория. Репозиторий — единый монорепозиторий, отдельный от репозитория фронтенда (EFS), с одним docker-compose на весь стек. Оба решения зафиксированы напрямую пользователем в ходе коучинг-сессии.</p>
+</section>
+
+<section class="block" id="data-model">
+  <h2 class="section-title">Модель данных и владение по сервисам</h2>
+  <p>Ключевые сущности выведены из форм <code>mockData.js</code> — приведены только имена и связи; связи между сервисами — исключительно по ID (AD-2), никогда не общие таблицы.</p>
+  <table>
+    <tr><th>Сущность</th><th>Владеющий сервис</th><th>Связь</th></tr>
+    <tr><td><code>CLIENT</code>, <code>CLIENT_TRIGGER</code></td><td>client-identity</td><td>Клиент имеет множество триггеров</td></tr>
+    <tr><td><code>OFFER</code></td><td>offers</td><td>Ссылка на клиента по <code>clientId</code> (AD-1, AD-10)</td></tr>
+    <tr><td><code>CARD</code>, <code>ACCOUNT_DOCUMENT</code></td><td>card-account</td><td>Карта — по <code>clientId</code>; документ по счёту — по <code>cardId</code></td></tr>
+    <tr><td><code>ISSUANCE_APPLICATION</code></td><td>card-issuance</td><td>Ссылка на клиента по <code>clientId</code></td></tr>
+    <tr><td><code>OPERATION</code></td><td>operations</td><td>Ссылка на карту по <code>cardId</code></td></tr>
+    <tr><td><code>BLOCK</code></td><td>risk-blocks</td><td>Ссылка на карту по <code>cardId</code></td></tr>
+    <tr><td><code>CASHBACK_SUMMARY</code>, <code>CASHBACK_CATEGORY</code></td><td>cashback</td><td>Сводка — по <code>cardId</code>; категория принадлежит сводке</td></tr>
+    <tr><td><code>NOTIFICATION_SETTING</code>, <code>NOTIFICATION_METHOD</code></td><td>notifications</td><td>Настройка — по <code>cardId</code>; способ связи — по <code>clientId</code></td></tr>
+    <tr><td><code>SINGLE_INCIDENT</code>, <code>COMPLAINT</code>, <code>MASS_INCIDENT</code></td><td>incident-case</td><td>Единичный инцидент и жалоба — по <code>clientId</code>; клиент привязывается к массовому инциденту по ID (many-to-many)</td></tr>
+  </table>
+  <p>Практическое следствие для читателя, незнакомого с деталями: если два экрана фронтенда показывают данные, которые выглядят связанными (например, имя клиента рядом с картой), это не значит, что один сервис хранит копию данных другого — Gateway агрегирует независимые вызовы, а сами сервисы обмениваются только идентификаторами.</p>
+</section>
+
+<section class="block" id="tree">
+  <h2 class="section-title">Структура репозитория</h2>
+  <p>Единый монорепозиторий, отдельный от фронтенда (EFS), с Maven multi-module и одним docker-compose на весь стек:</p>
+  <div class="pkg-tree">mts-client-card-office-backend/
+  pom.xml                          # родительский агрегирующий POM
+  docker-compose.yml               # gateway + 9 сервисов + Kafka + своя Postgres на сервис
+  gateway/
+  client-identity-service/
+  offers-service/                  # + adapters/out/external/offer-engine/ (AD-10)
+  card-account-service/
+  card-issuance-service/
+  operations-service/
+  risk-blocks-service/             # + adapters/out/external/{sfm,fssp,antifraud}/ (AD-10)
+  cashback-service/
+  notifications-service/
+  incident-case-service/           # + adapters/in/messaging/ Kafka-консьюмер (AD-5, AD-11)
+                                    # + модуль Testcontainers Kafka в интеграционных тестах</div>
+  <p>Каждый сервисный модуль внутри повторяет hexagonal-layout, описанный выше в разделе «Внутреннее устройство сервиса».</p>
+</section>
+
+<section class="block" id="deferred">
+  <h2 class="section-title">Что отложено и почему</h2>
+  <p>Каждый из следующих пунктов сознательно не решён в этой архитектуре — не по недосмотру, а потому что условие для его решения ещё не наступило. У каждого указано, что именно это условие означает.</p>
+
+  <div class="deferred-item">
+    <h4>Модель роли сотрудника (КЦ / Чат / Офис)</h4>
+    <p>Фронтенд сегодня реализует только роль «Офис». То, как именно определяется роль (поле в сессии, AD-группа, отдельный URL), не решено — этот открытый вопрос перенесён без изменений из README проекта.</p>
+    <p class="revisit">Условие пересмотра: появление фронтенд-оболочки для второй роли.</p>
+  </div>
+
+  <div class="deferred-item">
+    <h4>Продакшн-авторизация: OAuth2/OIDC через корпоративный SSO</h4>
+    <p>Явно названная замена сегодняшней заглушки <code>X-Employee-Id</code> (AD-7) — эта замена не строится сейчас, но её название и место в архитектуре уже зафиксированы, чтобы при переходе от демо к продакшену не пришлось заново придумывать, чем заменить заглушку.</p>
+    <p class="revisit">Условие пересмотра: трек перестаёт быть демо.</p>
+  </div>
+
+  <div class="deferred-item">
+    <h4>Продакшн-контур эксплуатации: облако, Kubernetes, CI/CD</h4>
+    <p>Демо-масштабу достаточно локального docker-compose (gateway + 9 сервисов + Kafka + Postgres на сервис), описанного в структуре репозитория выше. Выбор облачного провайдера, оркестрации и процесса выката — отдельная задача, которая не имеет смысла до того, как появится реальный продакшн-трек.</p>
+    <p class="revisit">Условие пересмотра: этот трек становится реальным продакшеном.</p>
+  </div>
+
+  <div class="deferred-item">
+    <h4>Реальные протоколы интеграции с СФМ / ФССП / антифродом / офер-движком / системой мониторинга</h4>
+    <p>Все пять внешних систем сегодня — stub-адаптеры с фикстурами. AD-10 держит точку подключения каждой чистой (порт в домене, адаптер снаружи), но сам протокол — REST, SOAP или файловый обмен — не определён и находится вне рамок, пока это остаётся демо.</p>
+    <p class="revisit">Условие пересмотра: начало работы над реальной интеграцией конкретной системы.</p>
+  </div>
+
+  <div class="deferred-item">
+    <h4>Адаптивная (планшетная) вёрстка</h4>
+    <p>Подтверждено пользователем как забота фронтенд/дизайн-трека (отдельный трек адаптивной вёрстки Granat 2.0), не бэкенда — API-контракты device-agnostic независимо от вёрстки.</p>
+    <p class="revisit">Не бэкенд-зависимость; отслеживается параллельным треком.</p>
+  </div>
+
+  <div class="deferred-item">
+    <h4>Источник UI-кита / дизайн-системы</h4>
+    <p>Открытый вопрос из README о том, есть ли у МТС Банк внутренний Storybook/npm-пакет. Не привязывает ничего в этой спине бэкенда — упомянут здесь только для полноты, а не как отложенное решение бэкенда.</p>
+    <p class="revisit">Не бэкенд-зависимость.</p>
+  </div>
+</section>
+
+<section class="block" id="closing">
+  <h2 class="section-title">Статус и дальнейшие шаги</h2>
+  <p><code>ARCHITECTURE-SPINE.md</code> зафиксирован со статусом <code>final</code>: 11 архитектурных решений (AD-1…AD-11), девять bounded context, две mermaid-диаграммы (направление зависимостей и контейнеры), ERD и структурный seed. Этот документ — его прозаический компаньон для тех, кто не участвовал в коучинг-сессии; при расхождении в формулировках источником истины остаётся спина.</p>
+  <p>Рекомендованный следующий шаг — принять спину как companion спецификации (<code>bmad-spec</code>), сохраняя ID решений (AD-n) стабильными, чтобы последующее разбиение на эпики и истории могло на них ссылаться напрямую.</p>
+</section>
+
+<footer class="doc-footer">
+  <span>card-office · МТС Банк · демо/прототип</span>
+  <span>Источник: ARCHITECTURE-SPINE.md (final, 2026-09-23)</span>
+</footer>
+
+</div>
+</body>
+</html>
