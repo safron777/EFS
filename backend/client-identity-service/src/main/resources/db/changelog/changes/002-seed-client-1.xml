@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Seed data verbatim from src/api/mockData.js `client` export (the one demo
+  client CAP-1's story allows (Boundaries & Constraints: "No seeding of
+  more than the one demo client"). openCaseIds carries only the bare ids
+  from mockData.client.openCases ("req-118391", "complaint-118240"); the
+  human-readable label text is deliberately dropped per AD-2 (see story
+  Design Notes).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="005-seed-client-1" author="client-identity-service">
+        <insert tableName="clients">
+            <column name="id" value="client-1"/>
+            <column name="full_name" value="Христорождественская Вильгельмина А."/>
+            <column name="client_since" valueNumeric="2019"/>
+        </insert>
+
+        <insert tableName="client_badges">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="badge" value="mts-bank"/>
+        </insert>
+        <insert tableName="client_badges">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="badge" value="mts-dengi"/>
+        </insert>
+
+        <insert tableName="client_triggers">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="trigger_key" value="passport-expired"/>
+            <column name="icon" value="passport"/>
+            <column name="tone" value="warning"/>
+            <column name="title" value="Просрочен паспорт"/>
+            <column name="text" value="Требуется обновление документа."/>
+            <column name="link" value="/client/data"/>
+        </insert>
+        <insert tableName="client_triggers">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="trigger_key" value="vip"/>
+            <column name="icon" value="star"/>
+            <column name="tone" value="vip"/>
+            <column name="title" value="VIP-клиент"/>
+            <column name="text" value="Премиальный уровень обслуживания."/>
+            <column name="link" value="/client/profile"/>
+        </insert>
+        <insert tableName="client_triggers">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="2"/>
+            <column name="trigger_key" value="mobile-app"/>
+            <column name="icon" value="smartphone"/>
+            <column name="tone" value="info"/>
+            <column name="title" value="Есть мобильное приложение"/>
+            <column name="text" value="Клиент активен в приложении МТС Деньги."/>
+            <!-- link intentionally omitted -> NULL, matching mockData.js's
+                 `link: null` for this trigger (I/O matrix row 3). -->
+        </insert>
+        <insert tableName="client_triggers">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="3"/>
+            <column name="trigger_key" value="arrests"/>
+            <column name="icon" value="shield-alert"/>
+            <column name="tone" value="danger"/>
+            <column name="title" value="Есть аресты"/>
+            <column name="text" value="Наложены ограничения ФССП."/>
+            <column name="link" value="/products/debit-mts-dengi/blocks"/>
+        </insert>
+        <insert tableName="client_triggers">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="4"/>
+            <column name="trigger_key" value="blocks"/>
+            <column name="icon" value="lock"/>
+            <column name="tone" value="danger"/>
+            <column name="title" value="Есть блокировки"/>
+            <column name="text" value="По карте действует блокировка СФМ."/>
+            <column name="link" value="/products/debit-mts-dengi/blocks"/>
+        </insert>
+
+        <insert tableName="client_open_case_ids">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="case_id" value="req-118391"/>
+        </insert>
+        <insert tableName="client_open_case_ids">
+            <column name="client_id" value="client-1"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="case_id" value="complaint-118240"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-1 (client identity) schema: clients, client_badges, client_triggers,
+  client_open_case_ids (story 1-client-identity task list). client_badges and
+  client_open_case_ids are ordered lists of scalar strings (no identity of
+  their own beyond client + position), so their primary key is the composite
+  (client_id, sort_order) rather than a synthetic id column. client_triggers
+  is a real child entity (has its own fields), so it gets its own surrogate
+  id.
+
+  openCaseIds stores bare case IDs only (story Boundaries & Constraints:
+  AD-2, no denormalized copy of incident-case-service's label text).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-clients-table" author="client-identity-service">
+        <createTable tableName="clients">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="full_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_since" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="002-create-client-badges-table" author="client-identity-service">
+        <createTable tableName="client_badges">
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="badge" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="client_badges" columnNames="client_id, sort_order"
+                        constraintName="pk_client_badges"/>
+        <addForeignKeyConstraint baseTableName="client_badges" baseColumnNames="client_id"
+                                  referencedTableName="clients" referencedColumnNames="id"
+                                  constraintName="fk_client_badges_client" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="003-create-client-triggers-table" author="client-identity-service">
+        <createTable tableName="client_triggers">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <!-- business-facing trigger id (e.g. "passport-expired"); not the
+                 table's own primary key, since a future client could in
+                 principle reuse the same trigger key. -->
+            <column name="trigger_key" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tone" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- AD-4: relative-internal path or NULL only; enforced again in
+                 the domain layer (ClientTrigger) before a response ever
+                 leaves this service; this column intentionally allows any
+                 varchar so that guard has a single owner. -->
+            <column name="link" type="varchar(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="client_triggers" baseColumnNames="client_id"
+                                  referencedTableName="clients" referencedColumnNames="id"
+                                  constraintName="fk_client_triggers_client" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="004-create-client-open-case-ids-table" author="client-identity-service">
+        <createTable tableName="client_open_case_ids">
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="case_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="client_open_case_ids" columnNames="client_id, sort_order"
+                        constraintName="pk_client_open_case_ids"/>
+        <addForeignKeyConstraint baseTableName="client_open_case_ids" baseColumnNames="client_id"
+                                  referencedTableName="clients" referencedColumnNames="id"
+                                  constraintName="fk_client_open_case_ids_client" onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Added after 003 shipped: Liquibase changesets are immutable once
+         applied (editing 003 in place changes its checksum and breaks
+         ValidationFailedException on every environment that already ran it,
+         as happened here). New constraints on an existing table always go in
+         a new changeset. -->
+    <changeSet id="005-client-triggers-constraints" author="client-identity-service">
+        <addUniqueConstraint tableName="client_triggers" columnNames="client_id, trigger_key"
+                              constraintName="uq_client_triggers_client_id_trigger_key"/>
+        <!-- Postgres does not auto-index FK columns (unlike the PK it
+             backs on the referenced side); client_badges/client_open_case_ids
+             get this for free from their composite (client_id, sort_order)
+             primary key, but client_triggers' PK is the surrogate id alone. -->
+        <createIndex tableName="client_triggers" indexName="ix_client_triggers_client_id">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

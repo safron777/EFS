@@ -37,10 +37,24 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring-boot.version>4.1.1</spring-boot.version>
+    <!-- ARCHITECTURE-SPINE.md Stack table pins this explicitly (unlike
+         Liquibase, which stays on whatever version the Spring Boot BOM
+         manages), so it is imported ahead of spring-boot-dependencies below:
+         Maven resolves a dependencyManagement GAV to whichever import
+         declares it first, and this import must win over Boot's own
+         (older) testcontainers-bom pin. -->
+    <testcontainers.version>2.0.5</testcontainers.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>

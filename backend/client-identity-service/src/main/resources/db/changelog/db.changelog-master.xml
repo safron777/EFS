@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AD-12: schema migrations via Liquibase, one changelog set per service,
+  scoped to this service's own database only. This master file only
+  includes; each included file owns one coherent unit of change (schema,
+  then seed data) so future stories append new <include> lines here rather
+  than editing history.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <include file="db/changelog/changes/001-create-client-identity-schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/002-seed-client-1.xml" relativeToChangelogFile="false"/>
+
+</databaseChangeLog>

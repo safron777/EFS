@@ -15,8 +15,9 @@
   <packaging>jar</packaging>
   <name>client-identity-service</name>
   <description>
-    CAP-1 (client identity): client profile, badges, triggers, open-case reference links. Story 0 scope: a booting Spring Boot app with a health endpoint and the hexagonal
-    package skeleton only -- no business endpoints yet (see docs/specs/spec-mts-client-card-office-backend).
+    CAP-1 (client identity): client profile, badges, triggers, open-case reference links.
+    Story 1 (docs/specs/spec-mts-client-card-office-backend/stories/1-client-identity.md)
+    adds the Liquibase-managed schema and the read-only GET /clients/{id} hexagonal slice.
   </description>
 
   <dependencies>
@@ -38,8 +39,49 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- AD-12: schema migrations via Liquibase, version managed by the
+           Spring Boot BOM (not overridden, stays on Boot's tested pairing,
+           per ARCHITECTURE-SPINE.md Stack table). -->
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Spring Boot 4's autoconfigure module was split per-feature;
+           LiquibaseAutoConfiguration (which actually wires spring.liquibase.*
+           and runs the changelog on startup) now lives here rather than in
+           spring-boot-autoconfigure. liquibase-core alone is not sufficient. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-liquibase</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- WebTestClient against a Servlet-stack (spring-boot-starter-web) app
+           needs the WebFlux client on the test classpath; it is not pulled
+           in by spring-boot-starter-test alone. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Testcontainers 2.x renamed its modules with a testcontainers-
+           prefix (e.g. junit-jupiter -> testcontainers-junit-jupiter); the
+           Java package (org.testcontainers.junit.jupiter) is unchanged. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-postgresql</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
