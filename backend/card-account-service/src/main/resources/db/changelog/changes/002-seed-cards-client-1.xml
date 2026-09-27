@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Seed data from src/api/mockData.js `cards` export, for client-1 /
+  debit-mts-dengi, with the two deliberate wire-format corrections the
+  mock itself doesn't make (story Boundaries & Constraints, AD-3 and the
+  ISO-8601 dates convention from story 1-client-identity):
+
+    - balance: the mock's raw-ruble 12430/0 becomes 1243000/0 kopecks.
+    - issuedAt/closedAt: the mock's "12.01.2025"/"20.10.2025" become
+      2025-01-12/2025-10-20 (ISO-8601 date columns).
+
+  Per-row field presence is reproduced exactly: card-4019 (active) gets
+  account+issued_at and no closed_at; card-7274 (closed) gets closed_at and
+  no account/issued_at.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="002-seed-cards-client-1" author="card-account-service">
+        <insert tableName="cards">
+            <column name="id" value="card-4019"/>
+            <column name="client_id" value="client-1"/>
+            <column name="product_id" value="debit-mts-dengi"/>
+            <column name="product" value="Zero"/>
+            <column name="masked" value="•••• 4019"/>
+            <column name="subtitle" value="8_MC World Zero RUR"/>
+            <column name="is_main" valueBoolean="true"/>
+            <column name="status" value="active"/>
+            <column name="balance_minor_units" valueNumeric="1243000"/>
+            <column name="issued_at" valueDate="2025-01-12"/>
+            <column name="account" value="****6272"/>
+            <!-- closed_at intentionally omitted -> NULL: this card is active. -->
+        </insert>
+
+        <insert tableName="cards">
+            <column name="id" value="card-7274"/>
+            <column name="client_id" value="client-1"/>
+            <column name="product_id" value="debit-mts-dengi"/>
+            <column name="product" value="ZERO"/>
+            <column name="masked" value="•••• 7274"/>
+            <column name="subtitle" value="8_MC World Zero RUR · Виртуальная"/>
+            <column name="is_main" valueBoolean="false"/>
+            <column name="status" value="closed"/>
+            <column name="balance_minor_units" valueNumeric="0"/>
+            <!-- account/issued_at intentionally omitted -> NULL: this card is closed. -->
+            <column name="closed_at" valueDate="2025-10-20"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

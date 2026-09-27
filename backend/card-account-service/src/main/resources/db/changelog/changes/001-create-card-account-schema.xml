@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-3 (cards and balances) schema: a single `cards` table. client_id/
+  product_id scope each row to the owning client/product for the
+  `findByClientIdAndProductId` query (story task list); they are not part of
+  the domain `Card` object or the web response, per AD-2 (cross-context
+  references by id only, see `Card`'s Javadoc).
+
+  issued_at/account/closed_at are nullable: an active card carries
+  account+issued_at and no closed_at; a closed card carries closed_at and no
+  account/issued_at, reproducing mockData.cards' per-row field presence
+  exactly (story Boundaries & Constraints), not a uniform shape with nulls
+  padded in everywhere.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-cards-table" author="card-account-service">
+        <createTable tableName="cards">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="masked" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subtitle" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_main" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- AD-3: signed integer minor units (kopecks), never a formatted string. -->
+            <column name="balance_minor_units" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issued_at" type="date"/>
+            <column name="account" type="varchar(32)"/>
+            <column name="closed_at" type="date"/>
+        </createTable>
+        <!-- Backs the `findByClientIdAndProductId` query (Postgres does not
+             auto-index arbitrary non-PK columns). -->
+        <createIndex tableName="cards" indexName="ix_cards_client_id_product_id">
+            <column name="client_id"/>
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
