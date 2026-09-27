@@ -36,9 +36,16 @@ public class ClientExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
             Exception exception, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-        HttpStatus status = HttpStatus.valueOf(statusCode.value());
-        String code = status.is4xxClientError() ? "VALIDATION_ERROR" : "INTERNAL_ERROR";
-        return ResponseEntity.status(status).body((Object) ErrorResponse.of(code, exception.getMessage()));
+        String code;
+        if (statusCode.is4xxClientError()) {
+            code = "VALIDATION_ERROR";
+        } else if (statusCode.is5xxServerError()) {
+            code = "INTERNAL_ERROR";
+        } else {
+            code = "INTERNAL_ERROR";
+        }
+        String message = exception.getMessage() != null ? exception.getMessage() : "An unexpected error occurred.";
+        return ResponseEntity.status(statusCode).body((Object) ErrorResponse.of(code, message));
     }
 
     /**
