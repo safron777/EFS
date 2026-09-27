@@ -42,6 +42,14 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!-- WebTestClient against a Servlet-stack (spring-boot-starter-web) app
+           needs the WebFlux client on the test classpath; it is not pulled
+           in by spring-boot-starter-test alone. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
