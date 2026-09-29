@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-4 (account documents) schema plus seed: a single `documents` table,
+  seeded with the three static documents from src/api/mockData.js
+  `documents` export. New changeset only; 001/002 (Story 3) are never
+  edited (AD-12, story 1's changeset-immutability lesson).
+
+  No client_id/card_id columns: mockData.documents itself is unconditional
+  (same 3 documents regardless of client/card), so the seed is global, not
+  per-client/card, the same simplification Story 2 already made for
+  `offers` (story Design Notes).
+
+  sort_order exists purely to reproduce mockData.documents' array order
+  (statement, balance certificate, flow certificate) exactly; that order
+  isn't alphabetical by id, so it can't be derived from the row's own
+  fields at query time.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="003-create-documents-table" author="card-account-service">
+        <createTable tableName="documents">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subtitle" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="003-seed-documents" author="card-account-service">
+        <insert tableName="documents">
+            <column name="id" value="doc-statement"/>
+            <column name="title" value="Выписка по счёту •••• 4019"/>
+            <column name="subtitle" value="За последние 30 дней · PDF"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="documents">
+            <column name="id" value="doc-balance-cert"/>
+            <column name="title" value="Справка об остатке денежных средств"/>
+            <column name="subtitle" value="На сегодняшнюю дату"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="documents">
+            <column name="id" value="doc-flow-cert"/>
+            <column name="title" value="Справка о движении средств"/>
+            <column name="subtitle" value="За произвольный период, для налоговой/визы"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

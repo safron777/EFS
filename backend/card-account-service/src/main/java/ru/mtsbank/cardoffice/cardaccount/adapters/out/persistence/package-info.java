@@ -2,6 +2,8 @@
  * JPA repositories implementing domain repository ports against this service's
  * own PostgreSQL schema (AD-1: DB-per-service, no shared schema). Populated
  * by story 3-card-account-cards (CAP-3): {@code CardEntity},
- * {@code CardJpaRepository} and {@code JpaCardRepository}.
+ * {@code CardJpaRepository} and {@code JpaCardRepository}. Story
+ * 4-card-account-documents (CAP-4) adds {@code DocumentEntity},
+ * {@code DocumentJpaRepository} and {@code JpaDocumentRepository}.
  */
 package ru.mtsbank.cardoffice.cardaccount.adapters.out.persistence;

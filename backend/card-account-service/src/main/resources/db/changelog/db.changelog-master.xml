@@ -14,5 +14,6 @@
 
     <include file="db/changelog/changes/001-create-card-account-schema.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/002-seed-cards-client-1.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/003-create-documents-and-seed.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

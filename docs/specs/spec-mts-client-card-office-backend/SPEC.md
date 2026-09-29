@@ -28,8 +28,8 @@ The React frontend prototype (`src/api/client.js`) currently mocks all backend b
   - **success:** Given `clientId` + `productId`, returns the card list with balances/status; switching the active card re-fetches card-scoped data.
 
 - **CAP-4** — Account documents
-  - **intent:** Employee retrieves the documents needed to answer a client request on the spot.
-  - **success:** Given a `cardId`, returns the document list (statement, balance certificate, flow certificate) matching `mockData.documents`.
+  - **intent:** Employee retrieves the documents needed to answer a client request on the spot, and can send or print one for the client.
+  - **success:** Given a `cardId`, returns the document list (statement, balance certificate, flow certificate) matching `mockData.documents`; a send/print action on a `documentId` succeeds and matches `client.js`'s existing `sendDocument`/`printDocument` mutation contract.
 
 - **CAP-5** — Card issuance
   - **intent:** Employee acts on a client's request to reissue or newly issue a card, and sees prior issuance history.
