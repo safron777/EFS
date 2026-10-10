@@ -15,8 +15,9 @@
   <packaging>jar</packaging>
   <name>risk-blocks-service</name>
   <description>
-    CAP-7 (risk blocks): a facade over stub adapters for SFM / FSSP-arrest / antifraud. Story 0 scope: a booting Spring Boot app with a health endpoint and the hexagonal
-    package skeleton only -- no business endpoints yet (see docs/specs/spec-mts-client-card-office-backend).
+    CAP-7 (risk blocks): a facade over stub adapters for SFM / FSSP-arrest / antifraud.
+    Story 7-risk-blocks scope: GET /cards/{cardId}/blocks, composing three independent
+    AD-10 stub ports into one response (see docs/specs/spec-mts-client-card-office-backend).
   </description>
 
   <dependencies>
@@ -40,6 +41,14 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- WebTestClient against a Servlet-stack (spring-boot-starter-web) app
+           needs the WebFlux client on the test classpath; it is not pulled
+           in by spring-boot-starter-test alone. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
