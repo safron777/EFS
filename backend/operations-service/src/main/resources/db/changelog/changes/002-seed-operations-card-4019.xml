@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-6 seed: the 5 rows of src/api/mockData.js `operations.rows`, plus its
+  one `failedAlert`, both scoped to `card-4019` only (client-1's active
+  card, per Story 3's seed); `card-7274` (Story 3's other seeded card)
+  and every other cardId deliberately get no rows and no alert row at all,
+  per story Boundaries & Constraints ("this is a deliberate scoping call,
+  not a gap").
+
+  op_date ISO-8601 conversion (story Boundaries & Constraints): the mock's
+  "dd.MM" rows have no year; `failedAlert.text`'s embedded "12.09.2026"
+  pins the year 2026 for every row, since all five fall within the same
+  September:
+    - op1: mock "12.09" -> 2026-09-12
+    - op2: mock "11.09" -> 2026-09-11
+    - op3: mock "10.09" -> 2026-09-10
+    - op4: mock "09.09" -> 2026-09-09
+    - op5: mock "08.09" -> 2026-09-08
+
+  amount_minor_units (AD-3, kopecks, sign preserved from the mock's
+  "−"/"+" glyph):
+    - op1: mock "−5 000 ₽" -> -500000
+    - op2: mock "−1 240 ₽" -> -124000
+    - op3: mock "−2 000 ₽" -> -200000
+    - op4: mock "−890 ₽"   -> -89000
+    - op5: mock "+450 ₽"   -> +45000
+
+  status is seeded as the mock's exact literal Russian string, unchanged
+  ("Отклонён" / "Проведена" / "В обработке"); see Operation's class
+  Javadoc for why this field alone is never normalized.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="002-seed-operations-card-4019" author="operations-service">
+        <insert tableName="operations">
+            <column name="id" value="op1"/>
+            <column name="card_id" value="card-4019"/>
+            <column name="op_date" valueDate="2026-09-12"/>
+            <column name="description" value="Перевод по СБП на +7 999 ХХХ-ХХ-01"/>
+            <column name="amount_minor_units" valueNumeric="-500000"/>
+            <column name="status" value="Отклонён"/>
+        </insert>
+
+        <insert tableName="operations">
+            <column name="id" value="op2"/>
+            <column name="card_id" value="card-4019"/>
+            <column name="op_date" valueDate="2026-09-11"/>
+            <column name="description" value="Оплата · Wildberries"/>
+            <column name="amount_minor_units" valueNumeric="-124000"/>
+            <column name="status" value="Проведена"/>
+        </insert>
+
+        <insert tableName="operations">
+            <column name="id" value="op3"/>
+            <column name="card_id" value="card-4019"/>
+            <column name="op_date" valueDate="2026-09-10"/>
+            <column name="description" value="Перевод другу по номеру телефона"/>
+            <column name="amount_minor_units" valueNumeric="-200000"/>
+            <column name="status" value="Проведена"/>
+        </insert>
+
+        <insert tableName="operations">
+            <column name="id" value="op4"/>
+            <column name="card_id" value="card-4019"/>
+            <column name="op_date" valueDate="2026-09-09"/>
+            <column name="description" value="Оплата в приложении МТС Деньги"/>
+            <column name="amount_minor_units" valueNumeric="-89000"/>
+            <column name="status" value="В обработке"/>
+        </insert>
+
+        <insert tableName="operations">
+            <column name="id" value="op5"/>
+            <column name="card_id" value="card-4019"/>
+            <column name="op_date" valueDate="2026-09-08"/>
+            <column name="description" value="Возврат · Ozon"/>
+            <column name="amount_minor_units" valueNumeric="45000"/>
+            <column name="status" value="Проведена"/>
+        </insert>
+
+        <insert tableName="operation_alerts">
+            <column name="card_id" value="card-4019"/>
+            <column name="title" value="Ошибка при переводе по СБП"/>
+            <column name="text" value="12.09.2026 · Перевод на +7 999 ХХХ-ХХ-01 · 5 000 ₽ · отклонён банком-получателем"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

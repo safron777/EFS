@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-6 (operations history) schema: two tables, not one, because a
+  failed-transfer alert is a 0-or-1-per-card sub-aggregate, not a per-row
+  field (story Tasks & Acceptance rationale), the same two-table-split
+  precedent story 3/4 set for `cards` vs. `documents` in
+  card-account-service, applied here to `operations` vs.
+  `operation_alerts`.
+
+  `operations.card_id` scopes each row to its owning card by id only
+  (AD-2); no FK to another service's table, since no other service's
+  table lives in this schema (AD-1: DB-per-service).
+
+  `amount_minor_units` is a signed integer in kopecks (AD-3), never a
+  formatted string. `op_date` is a plain date (ISO-8601 on the wire); the
+  mock's year-less "dd.MM" strings are resolved to a full date at seed time
+  (see 002-seed-operations-card-4019.xml), not at query time.
+
+  `operation_alerts.card_id` is the primary key (not a surrogate id),
+  enforcing the 0-or-1-per-card cardinality directly in the schema: a
+  second insert for the same card_id is a constraint violation, not a
+  silently accepted duplicate.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-operations-table" author="operations-service">
+        <createTable tableName="operations">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="card_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="op_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- AD-3: signed integer minor units (kopecks), never a formatted string. -->
+            <column name="amount_minor_units" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <!-- Backs the `findByCardIdOrderByOpDateDesc` query (Postgres does not
+             auto-index arbitrary non-PK columns). -->
+        <createIndex tableName="operations" indexName="ix_operations_card_id">
+            <column name="card_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="001-create-operation-alerts-table" author="operations-service">
+        <createTable tableName="operation_alerts">
+            <column name="card_id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
