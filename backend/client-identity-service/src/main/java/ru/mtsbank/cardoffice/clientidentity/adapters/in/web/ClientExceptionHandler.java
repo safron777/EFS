@@ -45,7 +45,7 @@ public class ClientExceptionHandler extends ResponseEntityExceptionHandler {
             code = "INTERNAL_ERROR";
         }
         String message = exception.getMessage() != null ? exception.getMessage() : "An unexpected error occurred.";
-        return ResponseEntity.status(statusCode).body((Object) ErrorResponse.of(code, message));
+        return ResponseEntity.status(statusCode).headers(headers).body((Object) ErrorResponse.of(code, message));
     }
 
     /**
