@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-5 (card issuance) schema plus seed: a single `issuance_applications`
+  table, seeded with the three static rows from src/api/mockData.js
+  `issuance.history` export, in their exact given order (not date-sorted:
+  app1 is the newest, app2/app3 are older but not in descending order
+  either; story Boundaries & Constraints). First changelog for this
+  service (Story 0 shipped no changesets).
+
+  No client_id/product_id columns: history is global in this demo (story
+  Boundaries & Constraints), the same simplification Story 4 made for
+  `documents` in card-account-service.
+
+  sort_order exists purely to reproduce the seeded order exactly and to let
+  a newly created application be appended after it (see
+  JpaIssuanceRepository); that order isn't derivable from `application_date`
+  at query time.
+
+  `date` is reserved/ambiguous enough in some SQL dialects that this column
+  is named `application_date` instead, to stay unambiguous across tooling.
+
+  history[].date ISO-8601 conversion (story Boundaries & Constraints):
+    - app1: mock "01.09" has no year; read as day.month of the demo's
+      current year (2026), becomes 2026-09-01.
+    - app2: mock "12.01.2025" becomes 2025-01-12.
+    - app3: mock "20.10.2025" becomes 2025-10-20.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-issuance-applications-table" author="card-issuance-service">
+        <createTable tableName="issuance_applications">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="application_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="card" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="method" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-seed-issuance-applications" author="card-issuance-service">
+        <insert tableName="issuance_applications">
+            <column name="id" value="app1"/>
+            <column name="application_date" valueDate="2026-09-01"/>
+            <column name="card" value="Zero (пластик)"/>
+            <column name="method" value="Курьер"/>
+            <column name="status" value="Изготовлена"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="issuance_applications">
+            <column name="id" value="app2"/>
+            <column name="application_date" valueDate="2025-01-12"/>
+            <column name="card" value="Zero (виртуальная)"/>
+            <column name="method" value="Мгновенно"/>
+            <column name="status" value="Выдана"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="issuance_applications">
+            <column name="id" value="app3"/>
+            <column name="application_date" valueDate="2025-10-20"/>
+            <column name="card" value="ZERO (виртуальная)"/>
+            <column name="method" value="Мгновенно"/>
+            <column name="status" value="Закрыта"/>
+            <column name="sort_order" valueNumeric="2"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Review fix: JpaIssuanceRepository.save allocates the next sort_order as a
+  non-atomic "select max(sort_order)+1, then insert", so a race between two
+  concurrent saves could otherwise persist two rows with the same
+  sort_order, silently corrupting history's seeded/created order. The
+  underlying atomic-allocation redesign is deferred; this changeset only
+  makes such a collision fail loudly (a constraint-violation error) instead
+  of silently succeeding. New changeset: 001 is never edited in place
+  (AD-12, the changeset-immutability rule every prior story has followed).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="002-add-sort-order-unique-constraint" author="card-issuance-service">
+        <addUniqueConstraint
+                tableName="issuance_applications"
+                columnNames="sort_order"
+                constraintName="uq_issuance_applications_sort_order"/>
+    </changeSet>
+
+</databaseChangeLog>
