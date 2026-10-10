@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Boot entry point for cashback-service.
  *
- * Story 0 scope: proves the container starts, connects to its own PostgreSQL
- * instance and answers on the Spring Boot Actuator health endpoint. No business
- * capability is implemented here yet -- see docs/specs/spec-mts-client-card-office-backend.
+ * CAP-8 (cashback): {@code GET /cards/{cardId}/cashback}, backed by its own
+ * PostgreSQL schema via Liquibase (AD-12) -- see
+ * docs/specs/spec-mts-client-card-office-backend/stories/8-cashback.md.
  */
 @SpringBootApplication
 public class CashbackServiceApplication {

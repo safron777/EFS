@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-8 (cashback) schema: a `cashback_summary` singleton table (one row:
+  accumulated total + the promo's plain columns) and a `cashback_categories`
+  table (the mock's four category rows).
+
+  Unlike offers-service/risk-blocks-service (facades with no schema),
+  cashback genuinely owns data (story Intent), so it gets a real
+  Liquibase-backed table pair even though, in this story, the data is
+  still a single unconditional fixture (story Boundaries & Constraints:
+  no per-card seed variation).
+
+  The promo is modeled as plain columns on the one `cashback_summary` row
+  rather than a separate table (story Design Notes): unlike story 7's
+  arrest block (0-or-1-per-card, genuinely optional), this mock's promo is
+  always present and singular, so a dedicated sub-table would be unneeded
+  ceremony for a fixture that never varies.
+
+  `cashback_categories` carries no `card_id`/`summary_id` column: like
+  story 4's `documents` table, the mock itself is unconditional (the same
+  four categories regardless of which card requested them), so the seed is
+  global, not per-card/summary.
+
+  `sort_order` exists purely to reproduce mockData.cashback.categories'
+  array order (cafe, azs, pharmacy, other) exactly; that order isn't
+  alphabetical by id, so it can't be derived from the row's own fields at
+  query time (same precedent as story 4's `documents.sort_order` and
+  story 5's issuance history ordering).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-cashback-summary-table" author="cashback-service">
+        <createTable tableName="cashback_summary">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!-- AD-3: signed integer minor units (kopecks), never a formatted string. -->
+            <column name="accumulated_minor_units" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="promo_title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="promo_text" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-cashback-categories-table" author="cashback-service">
+        <createTable tableName="cashback_categories">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="label" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Display-only rate string (AD-3 binds money, not percentages;
+                 story Boundaries & Constraints), kept as the mock's exact
+                 literal, e.g. "5%". -->
+            <column name="percent" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Opaque display string (e.g. "green", "gray"), same category
+                 as story 6's status / story 7's block text. -->
+            <column name="tone" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
