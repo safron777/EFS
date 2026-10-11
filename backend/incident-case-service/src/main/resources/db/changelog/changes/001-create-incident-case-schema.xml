@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-10 (mass incidents) schema: mass_incidents (the Kafka-populated read
+  model) and mass_incident_attachments (client-to-incident attachment
+  links), per story 10-incident-case-mass-incidents' task list.
+
+  mass_incidents.id is the monitoring system's own mass-incident id (e.g.
+  "MI-4471"), carried verbatim from each Kafka event's data.id, this
+  service never generates it, so it is the natural primary key, not a
+  surrogate one.
+
+  mass_incident_attachments is purely a link row with no identity of its
+  own beyond the (incident_id, client_id) pair it records, the same
+  precedent as client-identity-service's client_badges/client_open_case_ids
+  (composite primary key, no surrogate id column), chosen over
+  client_triggers' surrogate-id-plus-unique-constraint shape because this
+  table's only purpose is recording that one fact. The composite primary
+  key both satisfies the task's "unique on (incident_id, client_id)" and
+  makes a repeat attach of the same pair a plain update, not a duplicate
+  insert, keeping it idempotent by construction (story Boundaries &
+  Constraints).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-mass-incidents-table" author="incident-case-service">
+        <createTable tableName="mass_incidents">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="theme" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Free-text approximate string (e.g. "~3 200 клиентов"), unchanged from
+                 the mock: a description, not a number, so AD-3 doesn't apply (story
+                 Boundaries & Constraints). -->
+            <column name="affected" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-mass-incident-attachments-table" author="incident-case-service">
+        <createTable tableName="mass_incident_attachments">
+            <column name="incident_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attached_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="mass_incident_attachments" columnNames="incident_id, client_id"
+                        constraintName="pk_mass_incident_attachments"/>
+        <addForeignKeyConstraint baseTableName="mass_incident_attachments" baseColumnNames="incident_id"
+                                  referencedTableName="mass_incidents" referencedColumnNames="id"
+                                  constraintName="fk_mass_incident_attachments_incident" onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

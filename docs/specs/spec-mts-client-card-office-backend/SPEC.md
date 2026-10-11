@@ -84,4 +84,4 @@ The `docker-compose` stack (Gateway + 9 services + Kafka + 9 PostgreSQL instance
 
 ## Open Questions
 
-- AD-11 fixes the Kafka envelope and topic naming but not the actual `data` payload fields for `MassIncidentOpened`/`Updated`/`Closed`. Likely mirrors `mockData.massIncidents` (theme, product, start date, affected count, `matchesClient`, status) but this is not yet confirmed as the wire contract — needed before CAP-10's stories can be written precisely.
+(none — the last entry, the `MassIncidentOpened`/`Updated`/`Closed` `data` payload shape, was resolved during Story 10 planning; see `.memlog.md`)

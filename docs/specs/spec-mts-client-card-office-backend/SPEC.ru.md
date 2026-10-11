@@ -86,4 +86,4 @@ sources: []
 
 ## Открытые вопросы (Open Questions)
 
-- AD-11 фиксирует конверт и именование топиков Kafka, но не сами поля `data` для `MassIncidentOpened`/`Updated`/`Closed`. Вероятно, зеркалит `mockData.massIncidents` (theme, product, start date, affected count, `matchesClient`, status), но это ещё не подтверждено как контракт на проводе — нужно до того, как истории CAP-10 можно будет написать точно.
+(нет — последняя запись, форма полей `data` для `MassIncidentOpened`/`Updated`/`Closed`, решена на этапе планирования Истории 10; см. `.memlog.md`)
