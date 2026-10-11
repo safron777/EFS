@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-9 (notifications) schema: a `notification_channels` table (the mock's
+  three channel rows) and a `notification_method` singleton table (one row:
+  the client's primary contact method, OMT).
+
+  Like cashback-service (story 8), notifications genuinely owns data (story
+  Intent), so it gets a real Liquibase-backed table pair even though, in
+  this story, the data is still a single unconditional fixture (story
+  Boundaries & Constraints: no per-card seed variation).
+
+  `notification_channels` carries no `card_id` column: like story 8's
+  `cashback_categories`, the mock itself is unconditional (the same three
+  channels regardless of which card requested them), so the seed is global,
+  not per-card.
+
+  The persisted boolean column is named `enabled`, not `on`: `ON` is a SQL
+  keyword Postgres reserves for the JOIN syntax; avoiding it as a column
+  name avoids having to quote it everywhere (story Boundaries & Constraints
+  / Design Notes). The wire field and domain accessor stay `on`/`isOn()` to
+  mirror the mock exactly.
+
+  `sort_order` exists purely to reproduce mockData.notifications' array
+  order (sms-ops, sms-plan, push) exactly; that order isn't alphabetical by
+  id, so it can't be derived from the row's own fields at query time (same
+  precedent as story 8's `cashback_categories.sort_order`).
+
+  `notification_method` is a singleton table (one row, like story 8's
+  `cashback_summary`): the mock's `notificationMethod` is a single object,
+  not a list, and no method-change mutation exists for this story (story
+  Boundaries & Constraints), so one row suffices. Its `current` column name
+  matches the task list's own naming exactly; unlike `on`, `CURRENT` is a
+  non-reserved keyword in PostgreSQL (usable as an unquoted identifier), so
+  no renaming footgun applies there.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="001-create-notification-channels-table" author="notifications-service">
+        <createTable tableName="notification_channels">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subtitle" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Named `enabled`, not `on`: `ON` is a SQL keyword reserved
+                 for the JOIN syntax (story Boundaries & Constraints). -->
+            <column name="enabled" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Opaque display string (e.g. "Отключить", "Настроить"), carries
+                 no backend meaning (story Boundaries & Constraints). -->
+            <column name="action" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="001-create-notification-method-table" author="notifications-service">
+        <createTable tableName="notification_method">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
