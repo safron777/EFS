@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CAP-11 (single incidents and complaints) schema: single_incidents and
+  complaints, plus one id-generating sequence per table, per story
+  11-incident-case-single-incidents-complaints' task list.
+
+  Both tables are client-scoped CRUD-lite resources (no Kafka, no stub
+  ports, unlike mass_incidents in 001): id is each row's own business id
+  (either a seeded literal mock string, or a freshly generated ЕИ-<n>/
+  complaint-<n>), carried as the natural primary key, same precedent as
+  mass_incidents.id in 001.
+
+  client_id has no foreign-key constraint to a clients table: this service
+  has no clients table of its own (AD-2: cross-context references are by
+  id only, never a denormalized copy; client-identity-service owns the
+  actual client entity). An index is added since the primary key is id, not
+  client_id, so GET .../incidents/single and GET .../complaints (both
+  filtered by client_id) aren't full table scans, same rationale as
+  client-identity-service's client_triggers ix_client_triggers_client_id.
+
+  The two sequences start comfortably above the seeded rows' own numbers
+  (single incidents: 118225/117904; complaints: 118240/117580) purely so a
+  freshly created id is visually distinct from the seeded ones, not because
+  anything parses or compares them (story Boundaries & Constraints).
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="002-create-single-incidents-table" author="incident-case-service">
+        <createTable tableName="single_incidents">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="theme" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="line" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="single_incidents" indexName="ix_single_incidents_client_id">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-create-complaints-table" author="incident-case-service">
+        <createTable tableName="complaints">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="theme" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="term" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="complaints" indexName="ix_complaints_client_id">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-create-single-incident-id-seq" author="incident-case-service">
+        <createSequence sequenceName="single_incident_id_seq" startValue="200000" incrementBy="1"/>
+    </changeSet>
+
+    <changeSet id="002-create-complaint-id-seq" author="incident-case-service">
+        <createSequence sequenceName="complaint_id_seq" startValue="200000" incrementBy="1"/>
+    </changeSet>
+
+</databaseChangeLog>

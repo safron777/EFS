@@ -12,5 +12,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
 
     <include file="db/changelog/changes/001-create-incident-case-schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/002-create-single-incidents-and-complaints-schema.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/003-seed-single-incidents-and-complaints.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
