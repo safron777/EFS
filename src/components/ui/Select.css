@@ -1,0 +1,23 @@
+.select-wrap {
+  position: relative;
+  display: flex;
+}
+
+.select-control {
+  appearance: none;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.select-control:disabled {
+  cursor: default;
+}
+
+.select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}

@@ -9,6 +9,7 @@ import { IssuancePage } from "./pages/IssuancePage";
 import { MassIncidentsPage } from "./pages/incidents/MassIncidentsPage";
 import { SingleIncidentsPage } from "./pages/incidents/SingleIncidentsPage";
 import { ComplaintsPage } from "./pages/incidents/ComplaintsPage";
+import { DesignKitPage } from "./pages/DesignKitPage";
 
 /**
  * Маршруты роли "Офис". Когда добавятся роли КЦ/Чат, у них будет
@@ -20,6 +21,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="design-kit" element={<DesignKitPage />} />
+
         <Route element={<AppShellOffice />}>
           <Route index element={<Navigate to="/products/debit-mts-dengi/balance" replace />} />
 

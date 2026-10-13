@@ -1,0 +1,72 @@
+/**
+ * Общая оболочка для текстовых полей форм (Input, Textarea, Select):
+ * .field-label/.field-message переиспользуются и в RadioGroup, чтобы
+ * подпись и подсказка/ошибка выглядели одинаково независимо от типа
+ * управления. Вынесено в отдельный файл, а не продублировано в каждом
+ * компоненте — три копии одной и той же оболочки расходились бы при
+ * первой же правке (например, цвета фокуса).
+ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--font-size-base);
+}
+
+.field-label {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.field-required {
+  color: var(--color-danger);
+}
+
+.field-control {
+  width: 100%;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  padding: 8px 12px;
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+
+.field-control:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 0 0 3px var(--color-accent-blue-bg);
+}
+
+.field-control:disabled {
+  opacity: 0.5;
+  cursor: default;
+  background: var(--color-page-bg);
+}
+
+.field-control-error {
+  border-color: var(--color-danger-border);
+}
+
+.field-control-error:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-danger-bg);
+}
+
+.field-message {
+  font-size: var(--font-size-xs);
+}
+
+.field-message-hint {
+  color: var(--color-text-secondary);
+}
+
+.field-message-error {
+  color: var(--color-danger);
+}
